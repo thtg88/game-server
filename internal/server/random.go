@@ -18,7 +18,7 @@ type RandomGameServer struct {
 
 func New() *RandomGameServer {
 	return &RandomGameServer{
-		WaitingRoom: &waitingroom.WaitingRoom{},
+		WaitingRoom: waitingroom.New(),
 	}
 }
 
@@ -35,10 +35,7 @@ func (rgs *RandomGameServer) Loop() {
 			for rgs.WaitingRoom.PlayersWaiting() >= 2 {
 				// log.Default().Println("players waiting")
 
-				rgs.waitingRoomMutex.Lock()
-				newWaitingRoom, pair := rgs.Pair()
-				rgs.WaitingRoom = newWaitingRoom
-				rgs.waitingRoomMutex.Unlock()
+				pair := rgs.WaitingRoom.Pair()
 
 				rgs.gamesMutex.Lock()
 				g := game.New(pair)
@@ -107,21 +104,4 @@ func (rgs *RandomGameServer) Loop() {
 			time.Sleep(1 * time.Second)
 		}
 	}()
-}
-
-func (rgs *RandomGameServer) Pair() (*waitingroom.WaitingRoom, []*player.Player) {
-	pair := []*player.Player{}
-	newWaitingRoom := &waitingroom.WaitingRoom{}
-
-	for _, player := range rgs.WaitingRoom.Players {
-		// TODO: better pairing logic based on level
-
-		if len(pair) < 2 {
-			pair = append(pair, player)
-		} else {
-			newWaitingRoom.Players = append(newWaitingRoom.Players, player)
-		}
-	}
-
-	return newWaitingRoom, pair
 }
