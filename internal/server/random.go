@@ -33,14 +33,14 @@ func (rgs *RandomGameServer) Loop() {
 	go func() {
 		for {
 			for rgs.WaitingRoom.PlayersWaiting() >= 2 {
-				// log.Default().Println("players waiting")
+				log.Default().Println("players waiting")
 
 				pair := rgs.WaitingRoom.Pair()
 
 				rgs.gamesMutex.Lock()
 				g := game.New(pair)
 				rgs.Games = append(rgs.Games, g)
-				// log.Default().Printf("new game started with players: %s and %s, it will end at %s", pair[0].ID, pair[1].ID, g.EndDate.String())
+				log.Default().Printf("new game started with players: %s and %s, it will end at %s", pair[0].ID, pair[1].ID, g.EndDate.String())
 				rgs.gamesMutex.Unlock()
 			}
 
@@ -59,7 +59,7 @@ func (rgs *RandomGameServer) Loop() {
 				// go func() { game.Round() }()
 
 				if game.IsOver() {
-					// log.Default().Println("game over")
+					log.Default().Println("game over")
 					// TODO: Increment player levels
 
 					rgs.WaitingRoom.Sit([]*player.Player{game.Player1, game.Player2})
@@ -86,13 +86,13 @@ func (rgs *RandomGameServer) Loop() {
 	}()
 
 	// Kill random player
-	go func() {
-		for {
-			rgs.WaitingRoom.KillRandom()
+	// go func() {
+	// 	for {
+	// 		rgs.WaitingRoom.KillRandom()
 
-			time.Sleep(1500 * time.Millisecond)
-		}
-	}()
+	// 		time.Sleep(1500 * time.Millisecond)
+	// 	}
+	// }()
 
 	// Print Stats
 	go func() {

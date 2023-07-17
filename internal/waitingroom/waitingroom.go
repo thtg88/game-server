@@ -24,7 +24,7 @@ func (wr *WaitingRoom) Sit(players []*player.Player) {
 	pMap := make(map[string]*player.Player)
 	for _, p := range players {
 		pMap[p.ID] = p
-		// log.Default().Printf("player %s (level %d) sat at the waiting room", p.ID, p.Level)
+		log.Default().Printf("player %s (level %d) sat at the waiting room", p.ID, p.Level)
 	}
 
 	wr.PlayersMutex.Lock()
