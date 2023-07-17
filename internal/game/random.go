@@ -3,10 +3,13 @@ package game
 import (
 	"main/internal/player"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type RandomGame struct {
 	EndDate *time.Time
+	ID      string
 	Player1 *player.Player
 	Player2 *player.Player
 }
@@ -23,6 +26,7 @@ func New(players []*player.Player) *RandomGame {
 	endDate := now.Add(time.Second * time.Duration(offset))
 
 	return &RandomGame{
+		ID:      uuid.NewString(),
 		Player1: players[0],
 		Player2: players[1],
 		EndDate: &endDate,
