@@ -1,7 +1,6 @@
 package game
 
 import (
-	"log"
 	"main/internal/player"
 	"time"
 
@@ -39,7 +38,7 @@ func (rg *RandomGame) Start(gameOverCh chan<- string) {
 		rg.Round()
 	}
 
-	log.Default().Printf("[game] game %s over", rg.ID)
+	// log.Default().Printf("[game] game %s over", rg.ID)
 
 	// TODO: Increment player levels
 

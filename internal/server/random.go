@@ -48,7 +48,7 @@ func (rgs *RandomGameServer) Loop() {
 
 				rgs.gamesMutex.Unlock()
 
-				log.Default().Printf("[game-starter] new game started with players: %s and %s, it will end at %s", pair[0].ID, pair[1].ID, g.EndDate.String())
+				// log.Default().Printf("[game-starter] new game started with players: %s and %s, it will end at %s", pair[0].ID, pair[1].ID, g.EndDate.String())
 			}
 
 			time.Sleep(10 * time.Millisecond)
