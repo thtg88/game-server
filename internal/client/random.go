@@ -1,7 +1,6 @@
 package client
 
 import (
-	"log"
 	"main/internal/player"
 	"main/internal/server"
 	"time"
@@ -21,7 +20,7 @@ func Loop(gs server.GameServer) {
 	for {
 		c := New()
 
-		log.Default().Println("new client")
+		// log.Default().Println("new client")
 
 		gs.Join(c.Player)
 
