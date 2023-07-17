@@ -13,7 +13,7 @@ type Player struct {
 
 func Random() Player {
 	return Player{
-		ID:    uuid.New().String(),
+		ID:    uuid.NewString(),
 		Level: uint64(rand.Intn(1000)) + 1,
 	}
 }
