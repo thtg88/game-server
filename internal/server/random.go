@@ -10,10 +10,9 @@ import (
 )
 
 type RandomGameServer struct {
-	Games            []*game.RandomGame
-	gamesMutex       sync.RWMutex
-	WaitingRoom      *waitingroom.WaitingRoom
-	waitingRoomMutex sync.RWMutex
+	Games       []*game.RandomGame
+	gamesMutex  sync.RWMutex
+	WaitingRoom *waitingroom.WaitingRoom
 }
 
 func New() *RandomGameServer {
