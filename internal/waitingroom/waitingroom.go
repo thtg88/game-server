@@ -10,7 +10,7 @@ import (
 
 type WaitingRoom struct {
 	Players      cmap.ConcurrentMap[string, *player.Player]
-	PlayersMutex sync.RWMutex
+	playersMutex sync.RWMutex
 }
 
 func New() *WaitingRoom {
@@ -30,8 +30,8 @@ func (wr *WaitingRoom) Sit(players []*player.Player) {
 }
 
 func (wr *WaitingRoom) Pair() []*player.Player {
-	wr.PlayersMutex.Lock()
-	defer wr.PlayersMutex.Unlock()
+	wr.playersMutex.Lock()
+	defer wr.playersMutex.Unlock()
 
 	pair := []*player.Player{wr.RandomPlayerWaiting()}
 	for len(pair) < 2 {
@@ -53,8 +53,8 @@ func (wr *WaitingRoom) PlayersWaiting() int {
 }
 
 func (wr *WaitingRoom) KillRandom() {
-	wr.PlayersMutex.Lock()
-	defer wr.PlayersMutex.Unlock()
+	wr.playersMutex.Lock()
+	defer wr.playersMutex.Unlock()
 
 	condemned := wr.RandomPlayerWaiting()
 
