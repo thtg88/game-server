@@ -51,7 +51,7 @@ func (rgs *RandomGameServer) Loop() {
 				// log.Default().Printf("[game-starter] new game started with players: %s and %s, it will end at %s", pair[0].ID, pair[1].ID, g.EndDate.String())
 			}
 
-			time.Sleep(10 * time.Millisecond)
+			time.Sleep(4 * time.Millisecond)
 		}
 	}()
 

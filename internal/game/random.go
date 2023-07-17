@@ -46,7 +46,7 @@ func (rg *RandomGame) Start(gameOverCh chan<- string) {
 }
 
 func (rg *RandomGame) Round() {
-	time.Sleep(5 * time.Second)
+	time.Sleep(500 * time.Millisecond)
 }
 
 func (rg *RandomGame) IsOver() bool {

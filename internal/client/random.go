@@ -24,6 +24,6 @@ func Loop(gs server.GameServer) {
 
 		gs.Join(c.Player)
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(50 * time.Millisecond)
 	}
 }
