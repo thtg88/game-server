@@ -6,7 +6,7 @@ import (
 )
 
 type GameServer interface {
-	Join()
+	Join(*player.Player)
 	Loop()
 	Pair() (*waitingroom.WaitingRoom, []*player.Player)
 }

@@ -16,13 +16,13 @@ func New() *RandomClient {
 	return &RandomClient{Player: &p}
 }
 
-func Loop(rgs *server.RandomGameServer) {
+func Loop(gs server.GameServer) {
 	for {
 		c := New()
 
 		// log.Default().Println("new client")
 
-		rgs.WaitingRoom.Sit([]*player.Player{c.Player})
+		gs.Join(c.Player)
 
 		time.Sleep(1 * time.Second)
 	}

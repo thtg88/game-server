@@ -22,6 +22,10 @@ func New() *RandomGameServer {
 	}
 }
 
+func (rgs *RandomGameServer) Join(p *player.Player) {
+	rgs.WaitingRoom.Sit([]*player.Player{p})
+}
+
 func (rgs *RandomGameServer) Loop() {
 	log.Default().Println("server started")
 
