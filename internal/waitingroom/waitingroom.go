@@ -1,7 +1,6 @@
 package waitingroom
 
 import (
-	"log"
 	"main/internal/player"
 	"math/rand"
 	"sync"
@@ -24,11 +23,8 @@ func (wr *WaitingRoom) Sit(players []*player.Player) {
 	pMap := make(map[string]*player.Player)
 	for _, p := range players {
 		pMap[p.ID] = p
-		log.Default().Printf("player %s (level %d) sat at the waiting room", p.ID, p.Level)
+		// log.Default().Printf("player %s (level %d) sat at the waiting room", p.ID, p.Level)
 	}
-
-	wr.PlayersMutex.Lock()
-	defer wr.PlayersMutex.Unlock()
 
 	wr.Players.MSet(pMap)
 }
@@ -53,9 +49,6 @@ func (wr *WaitingRoom) Pair() []*player.Player {
 }
 
 func (wr *WaitingRoom) PlayersWaiting() int {
-	wr.PlayersMutex.RLock()
-	defer wr.PlayersMutex.RUnlock()
-
 	return wr.Players.Count()
 }
 
@@ -69,27 +62,28 @@ func (wr *WaitingRoom) KillRandom() {
 		return
 	}
 
-	log.Default().Printf("killing %s", condemned.ID)
+	// log.Default().Printf("killing %s", condemned.ID)
 
 	wr.Players.Remove(condemned.ID)
 }
 
 func (wr *WaitingRoom) RandomPlayerWaiting() *player.Player {
-	wr.PlayersMutex.RLock()
-	defer wr.PlayersMutex.RUnlock()
-
 	playersWaiting := wr.PlayersWaiting()
 
 	if playersWaiting == 0 {
 		return nil
 	}
 
-	ids := wr.Players.Keys()
-	killedIdx := rand.Intn(len(ids))
-
-	playerID := ids[killedIdx]
+	playerID := wr.RandomPlayerKey()
 
 	player, _ := wr.Players.Get(playerID)
 
 	return player
+}
+
+func (wr *WaitingRoom) RandomPlayerKey() string {
+	ids := wr.Players.Keys()
+	killedIdx := rand.Intn(len(ids))
+
+	return ids[killedIdx]
 }
