@@ -75,25 +75,41 @@ func (rgs *RandomGameServer) Loop() {
 
 			msg2 := fmt.Sprintf("[%s] [game-ender] game removed, %d games left", gameID, rgs.Games.Count())
 			log.Default().Printf(msg2)
-
-			// if ok {
-			// 	msg3 := fmt.Sprintf("[game-ender] sitting players %s and %s...", game.Player1.ID, game.Player2.ID)
-			// 	log.Default().Printf(msg3)
-			// 	game.SendMsgs(msg1, msg2, msg3)
-
-			// 	rgs.WaitingRoom.Sit([]*player.Player{game.Player1, game.Player2})
-			// }
 		}
 	}()
 
 	// Kill random player
-	// go func() {
-	// 	for {
-	// 		rgs.WaitingRoom.KillRandom()
+	go func() {
+		for {
+			time.Sleep(10 * time.Second)
 
-	// 		time.Sleep(1500 * time.Millisecond)
-	// 	}
-	// }()
+			rgs.WaitingRoom.KillRandom()
+		}
+	}()
+
+	go func() {
+		for {
+			time.Sleep(8 * time.Second)
+
+			var ids []string
+
+			rgs.gamesMutex.Lock()
+
+			for game := range rgs.Games.IterBuffered() {
+				if game.Val.IsOver() {
+					ids = append(ids, game.Val.ID)
+				}
+			}
+
+			log.Printf("[game-over-cleaner] removing %d games dangling...", len(ids))
+
+			for _, v := range ids {
+				rgs.Games.Pop(v)
+			}
+
+			rgs.gamesMutex.Unlock()
+		}
+	}()
 
 	// Print Stats
 	go func() {
