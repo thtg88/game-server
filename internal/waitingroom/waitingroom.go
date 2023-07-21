@@ -30,20 +30,17 @@ func (wr *WaitingRoom) Sit(players []*player.Player) {
 }
 
 func (wr *WaitingRoom) Pair() []*player.Player {
-	wr.playersMutex.Lock()
-	defer wr.playersMutex.Unlock()
-
 	pair := []*player.Player{wr.RandomPlayerWaiting()}
+	wr.Players.Remove(pair[0].ID)
+
 	for len(pair) < 2 {
 		p := wr.RandomPlayerWaiting()
 
-		if pair[0].ID != p.ID {
+		if p != nil && pair[0].ID != p.ID {
 			pair = append(pair, p)
+			wr.Players.Remove(pair[1].ID)
 		}
 	}
-
-	wr.Players.Remove(pair[0].ID)
-	wr.Players.Remove(pair[1].ID)
 
 	return pair
 }
