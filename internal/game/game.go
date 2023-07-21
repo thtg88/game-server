@@ -42,10 +42,13 @@ func New(players []*player.Player) *RandomGame {
 }
 
 func (rg *RandomGame) Start(gameOverCh chan<- string) {
-	for !rg.IsOver() {
+	for i := 0; !rg.IsOver(); i++ {
+		rg.SendMsgs(fmt.Sprintf("round %d starting...", i))
 		rg.Round()
+		rg.SendMsgs(fmt.Sprintf("round %d over!", i))
 	}
 
+	msg := fmt.Sprintf("[%s] [game] game over", rg.ID)
 	log.Default().Println(msg)
 
 	// TODO: Increment player levels
