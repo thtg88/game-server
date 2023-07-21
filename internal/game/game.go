@@ -2,8 +2,8 @@ package game
 
 import (
 	"fmt"
+	"game-server/internal/player"
 	"log"
-	"main/internal/player"
 	"time"
 
 	"github.com/google/uuid"
@@ -46,7 +46,6 @@ func (rg *RandomGame) Start(gameOverCh chan<- string) {
 		rg.Round()
 	}
 
-	msg := fmt.Sprintf("[game] game %s over", rg.ID)
 	log.Default().Println(msg)
 
 	// TODO: Increment player levels
