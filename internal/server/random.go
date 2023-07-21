@@ -11,6 +11,11 @@ import (
 	cmap "github.com/orcaman/concurrent-map/v2"
 )
 
+type GameServer interface {
+	Join(*player.Player)
+	Loop()
+}
+
 type RandomGameServer struct {
 	Games       cmap.ConcurrentMap[string, *game.RandomGame]
 	gamesMutex  sync.RWMutex
