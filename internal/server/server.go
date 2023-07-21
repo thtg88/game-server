@@ -54,6 +54,7 @@ func (rgs *RandomGameServer) Loop() {
 
 				rgs.gamesMutex.Unlock()
 
+				msg := fmt.Sprintf("[%s] [game-starter] new game started with players: %s and %s, it will end at %s", g.ID, pair[0].ID, pair[1].ID, g.EndDate.String())
 				g.SendMsgs(msg)
 				log.Default().Println(msg)
 			}
@@ -67,19 +68,21 @@ func (rgs *RandomGameServer) Loop() {
 		for {
 			gameID := <-gameOverCh
 
+			msg1 := fmt.Sprintf("[%s] [game-ender] received game over message", gameID)
 			log.Default().Println(msg1)
 
-			game, ok := rgs.Games.Pop(gameID)
+			rgs.Games.Pop(gameID)
 
+			msg2 := fmt.Sprintf("[%s] [game-ender] game removed, %d games left", gameID, rgs.Games.Count())
 			log.Default().Printf(msg2)
 
-			if ok {
-				// msg3 := fmt.Sprintf("[game-ender] sitting players %s and %s...", game.Player1.ID, game.Player2.ID)
-				log.Default().Printf(msg3)
-				game.SendMsgs(msg1, msg2, msg3)
+			// if ok {
+			// 	msg3 := fmt.Sprintf("[game-ender] sitting players %s and %s...", game.Player1.ID, game.Player2.ID)
+			// 	log.Default().Printf(msg3)
+			// 	game.SendMsgs(msg1, msg2, msg3)
 
-				rgs.WaitingRoom.Sit([]*player.Player{game.Player1, game.Player2})
-			}
+			// 	rgs.WaitingRoom.Sit([]*player.Player{game.Player1, game.Player2})
+			// }
 		}
 	}()
 

@@ -26,7 +26,7 @@ func (wr *WaitingRoom) Sit(players []*player.Player) {
 	for _, p := range players {
 		pMap[p.ID] = p
 		msg := fmt.Sprintf("player %s (level %d) sat at the waiting room", p.ID, p.Level)
-		p.SendMsgs(msg)
+		// p.SendMsgs(msg)
 		log.Default().Printf(msg)
 	}
 
