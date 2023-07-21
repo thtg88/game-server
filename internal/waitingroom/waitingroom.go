@@ -5,14 +5,12 @@ import (
 	"game-server/internal/player"
 	"log"
 	"math/rand"
-	"sync"
 
 	cmap "github.com/orcaman/concurrent-map/v2"
 )
 
 type WaitingRoom struct {
-	Players      cmap.ConcurrentMap[string, *player.Player]
-	playersMutex sync.RWMutex
+	Players cmap.ConcurrentMap[string, *player.Player]
 }
 
 func New() *WaitingRoom {
