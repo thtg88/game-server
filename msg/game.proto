@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option go_package = "github.com/thtg88/game-server/msg/game";
+option java_multiple_files = true;
+option java_package = "io.grpc.gameserver.msg";
+option java_outer_classname = "GameProto";
+
+package msg;
+
+// The Game service definition.
+service Game {
+  // A Bidirectional streaming RPC.
+  //
+  // Accepts a stream of PlayRequest sent while a route is being traversed,
+  // while receiving PlayReply.
+  rpc Play (stream PlayRequest) returns (stream PlayReply) {}
+}
+
+message Player {
+  string id = 1;
+  uint64 level = 2;
+}
+
+// The request message containing ...
+message PlayRequest {
+  Player player = 1;
+}
+
+// The response message containing ...
+message PlayReply {
+  string message = 1;
+}
