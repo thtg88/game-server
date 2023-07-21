@@ -52,7 +52,10 @@ func (wr *WaitingRoom) PlayersWaiting() int {
 }
 
 func (wr *WaitingRoom) KillRandom() {
-	wr.Players.Remove(wr.RandomPlayerKey())
+	player, ok := wr.Players.Pop(wr.RandomPlayerKey())
+	if ok {
+		player.GameOverCh <- true
+	}
 }
 
 func (wr *WaitingRoom) RandomPlayerWaiting() *player.Player {
