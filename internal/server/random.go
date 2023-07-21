@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"main/internal/game"
 	"main/internal/player"
@@ -53,7 +54,9 @@ func (rgs *RandomGameServer) Loop() {
 
 				rgs.gamesMutex.Unlock()
 
-				// log.Default().Printf("[game-starter] new game started with players: %s and %s, it will end at %s", pair[0].ID, pair[1].ID, g.EndDate.String())
+				msg := fmt.Sprintf("[game-starter] new game started with players: %s and %s, it will end at %s", pair[0].ID, pair[1].ID, g.EndDate.String())
+				g.SendMsgs(msg)
+				log.Default().Println(msg)
 			}
 
 			time.Sleep(4 * time.Millisecond)
@@ -64,11 +67,20 @@ func (rgs *RandomGameServer) Loop() {
 	go func() {
 		for {
 			gameID := <-gameOverCh
-			// log.Default().Printf("[game-ender] received game over message for ID: %s", gameID)
+
+			msg1 := fmt.Sprintf("[game-ender] received game over message for ID: %s", gameID)
+			log.Default().Println(msg1)
+
 			game, ok := rgs.Games.Pop(gameID)
-			// log.Default().Printf("[game-ender] game %s removed", gameID)
+
+			msg2 := fmt.Sprintf("[game-ender] game %s removed", gameID)
+			log.Default().Printf(msg2)
+
 			if ok {
-				// log.Default().Printf("[game-ender] sitting players %s and %s...", game.Player1.ID, game.Player2.ID)
+				msg3 := fmt.Sprintf("[game-ender] sitting players %s and %s...", game.Player1.ID, game.Player2.ID)
+				log.Default().Printf(msg3)
+				game.SendMsgs(msg1, msg2, msg3)
+
 				rgs.WaitingRoom.Sit([]*player.Player{game.Player1, game.Player2})
 			}
 		}
