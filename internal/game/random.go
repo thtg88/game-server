@@ -7,6 +7,12 @@ import (
 	"github.com/google/uuid"
 )
 
+type Game interface {
+	Round()
+	Start()
+	IsOver() bool
+}
+
 type RandomGame struct {
 	EndDate *time.Time
 	ID      string
