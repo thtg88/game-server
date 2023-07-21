@@ -35,32 +35,32 @@ func New() *RemoteRandomClient {
 	}
 }
 
-func (rrc *RemoteRandomClient) Join() {
+func (rrc *RemoteRandomClient) Join() error {
 	conn, err := grpc.Dial(
 		rrc.grpcDialTarget(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+		return err
 	}
 	defer conn.Close()
 
 	client := pb.NewGameClient(conn)
 
-	rrc.play(client)
+	return rrc.play(client)
 }
 
 func (rrc *RemoteRandomClient) grpcDialTarget() string {
 	return fmt.Sprintf("%s:%d", rrc.ServerConfig.Host, rrc.ServerConfig.Port)
 }
 
-func (rrc *RemoteRandomClient) play(client pb.GameClient) {
+func (rrc *RemoteRandomClient) play(client pb.GameClient) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
 
 	stream, err := client.Play(ctx)
 	if err != nil {
-		log.Fatalf("client.Play failed: %v", err)
+		return fmt.Errorf("client.Play failed: %v", err)
 	}
 
 	waitc := make(chan struct{})
@@ -81,17 +81,22 @@ func (rrc *RemoteRandomClient) play(client pb.GameClient) {
 				return
 			}
 			if err != nil {
-				log.Fatalf("client.Play failed: %v", err)
+				log.Printf("client.Play failed: %v", err)
+				break
 			}
 			log.Println(in.Message)
 		}
 	}()
 
 	if err := stream.Send(req); err != nil {
-		log.Fatalf("client.Play: stream.Send(%v) failed: %v", req, err)
+		return fmt.Errorf("client.Play: stream.Send(%v) failed: %v", req, err)
 	}
 
-	stream.CloseSend()
+	if err := stream.CloseSend(); err != nil {
+		return err
+	}
 
 	<-waitc
+
+	return nil
 }

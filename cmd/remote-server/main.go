@@ -1,7 +1,12 @@
 package main
 
-import "game-server/internal/remoteserver"
+import (
+	"game-server/internal/remoteserver"
+	"log"
+)
 
 func main() {
-	remoteserver.Serve()
+	if err := remoteserver.Serve(); err != nil {
+		log.Fatal(err)
+	}
 }

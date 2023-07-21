@@ -35,11 +35,11 @@ func New() *RemoteRandomGameServer {
 	}
 }
 
-func Serve() {
+func Serve() error {
 	rrgs := New()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", rrgs.Config.Port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		return fmt.Errorf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
 
@@ -50,8 +50,10 @@ func Serve() {
 	rrgs.RandomGameServer.Loop()
 
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		return fmt.Errorf("failed to serve: %v", err)
 	}
+
+	return nil
 }
 
 func (rrgs *RemoteRandomGameServer) Play(stream pb.Game_PlayServer) error {
