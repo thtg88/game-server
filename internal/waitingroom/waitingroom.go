@@ -53,18 +53,7 @@ func (wr *WaitingRoom) PlayersWaiting() int {
 }
 
 func (wr *WaitingRoom) KillRandom() {
-	wr.playersMutex.Lock()
-	defer wr.playersMutex.Unlock()
-
-	condemned := wr.RandomPlayerWaiting()
-
-	if condemned == nil {
-		return
-	}
-
-	// log.Default().Printf("killing %s", condemned.ID)
-
-	wr.Players.Remove(condemned.ID)
+	wr.Players.Remove(wr.RandomPlayerKey())
 }
 
 func (wr *WaitingRoom) RandomPlayerWaiting() *player.Player {
@@ -83,6 +72,11 @@ func (wr *WaitingRoom) RandomPlayerWaiting() *player.Player {
 
 func (wr *WaitingRoom) RandomPlayerKey() string {
 	ids := wr.Players.Keys()
+
+	if len(ids) == 0 {
+		return ""
+	}
+
 	killedIdx := rand.Intn(len(ids))
 
 	return ids[killedIdx]
