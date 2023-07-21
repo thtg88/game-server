@@ -7,13 +7,23 @@ import (
 )
 
 type Player struct {
-	ID    string
-	Level uint64
+	GameOverCh chan bool
+	ID         string
+	Level      uint64
+	MessagesCh chan string
 }
 
 func Random() Player {
 	return Player{
-		ID:    uuid.NewString(),
-		Level: uint64(rand.Intn(1000)) + 1,
+		GameOverCh: make(chan bool),
+		ID:         uuid.NewString(),
+		Level:      uint64(rand.Intn(1000)) + 1,
+		MessagesCh: make(chan string),
+	}
+}
+
+func (p *Player) SendMsgs(msgs ...string) {
+	for _, msg := range msgs {
+		p.MessagesCh <- msg
 	}
 }
