@@ -1,6 +1,8 @@
 package game
 
 import (
+	"fmt"
+	"log"
 	"main/internal/player"
 	"time"
 
@@ -44,7 +46,8 @@ func (rg *RandomGame) Start(gameOverCh chan<- string) {
 		rg.Round()
 	}
 
-	// log.Default().Printf("[game] game %s over", rg.ID)
+	msg := fmt.Sprintf("[game] game %s over", rg.ID)
+	log.Default().Println(msg)
 
 	// TODO: Increment player levels
 
@@ -58,4 +61,9 @@ func (rg *RandomGame) Round() {
 func (rg *RandomGame) IsOver() bool {
 	// end date is in the past
 	return rg.EndDate.Before(time.Now())
+}
+
+func (rg *RandomGame) SendMsgs(msgs ...string) {
+	rg.Player1.SendMsgs(msgs...)
+	rg.Player2.SendMsgs(msgs...)
 }
