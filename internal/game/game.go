@@ -43,9 +43,7 @@ func New(players []*player.Player) *RandomGame {
 
 func (rg *RandomGame) Start(gameOverCh chan<- string) {
 	for i := 0; !rg.IsOver(); i++ {
-		rg.SendMsgs(fmt.Sprintf("round %d starting...", i))
-		rg.Round()
-		rg.SendMsgs(fmt.Sprintf("round %d over!", i))
+		rg.Round(i)
 	}
 
 	msg := fmt.Sprintf("[%s] [game] game over", rg.ID)
@@ -61,8 +59,10 @@ func (rg *RandomGame) Start(gameOverCh chan<- string) {
 	gameOverCh <- rg.ID
 }
 
-func (rg *RandomGame) Round() {
+func (rg *RandomGame) Round(round int) {
+	rg.SendMsgs(fmt.Sprintf("[%s] [game] round %d starting...", rg.ID, round))
 	time.Sleep(500 * time.Millisecond)
+	rg.SendMsgs(fmt.Sprintf("[%s] [game] round %d over!", rg.ID, round))
 }
 
 func (rg *RandomGame) IsOver() bool {
