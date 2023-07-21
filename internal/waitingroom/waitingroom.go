@@ -1,6 +1,8 @@
 package waitingroom
 
 import (
+	"fmt"
+	"log"
 	"main/internal/player"
 	"math/rand"
 	"sync"
@@ -23,7 +25,9 @@ func (wr *WaitingRoom) Sit(players []*player.Player) {
 	pMap := make(map[string]*player.Player)
 	for _, p := range players {
 		pMap[p.ID] = p
-		// log.Default().Printf("player %s (level %d) sat at the waiting room", p.ID, p.Level)
+		msg := fmt.Sprintf("player %s (level %d) sat at the waiting room", p.ID, p.Level)
+		p.SendMsgs(msg)
+		log.Default().Printf(msg)
 	}
 
 	wr.Players.MSet(pMap)
