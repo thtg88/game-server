@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+type Client interface {
+}
+
 type RandomClient struct {
 	Player *player.Player
 }
