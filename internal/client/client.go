@@ -1,8 +1,8 @@
 package client
 
 import (
-	"main/internal/player"
-	"main/internal/server"
+	"game-server/internal/player"
+	"game-server/internal/server"
 	"time"
 )
 

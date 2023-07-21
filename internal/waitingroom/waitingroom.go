@@ -2,8 +2,8 @@ package waitingroom
 
 import (
 	"fmt"
+	"game-server/internal/player"
 	"log"
-	"main/internal/player"
 	"math/rand"
 	"sync"
 

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"main/internal/client"
-	"main/internal/server"
+	"game-server/internal/client"
+	"game-server/internal/server"
 )
 
 func main() {
