@@ -10,23 +10,21 @@ import (
 func main() {
 	var wg sync.WaitGroup
 
-	for {
-		for i := 0; i < 10000; i++ {
-			wg.Add(1)
+	for j := 0; j < 10000; j++ {
+		wg.Add(1)
 
-			go func() {
-				defer wg.Done()
+		go func() {
+			defer wg.Done()
 
-				rc := remoteclient.NewGrpcRandomClient()
+			rc := remoteclient.NewGrpcRandomClient()
 
-				if err := rc.Join(); err != nil {
-					log.Printf("%v", err)
-				}
-			}()
-		}
-
-		wg.Wait()
-
-		time.Sleep(10 * time.Second)
+			if err := rc.Join(); err != nil {
+				log.Printf("%v", err)
+			}
+		}()
 	}
+
+	wg.Wait()
+
+	time.Sleep(10 * time.Second)
 }
