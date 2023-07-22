@@ -1,12 +1,12 @@
 package main
 
 import (
-	"game-server/internal/grpcclient"
+	"game-server/internal/remoteclient"
 	"log"
 )
 
 func main() {
-	rc := grpcclient.New()
+	rc := remoteclient.NewGrpcRandomClient()
 
 	if err := rc.Join(); err != nil {
 		log.Fatal(err)

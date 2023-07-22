@@ -1,11 +1,11 @@
-package grpcclient
+package remoteclient
 
 import (
 	"context"
 	"fmt"
 	"game-server/internal/client"
-	"game-server/internal/grpcserver"
 	pb "game-server/internal/msgs/msg"
+	"game-server/internal/remoteserver"
 	"io"
 	"log"
 	"time"
@@ -14,23 +14,17 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-const DefaultServerHost = "localhost"
-
-type RemoteClient interface {
-	JoinRemoteServer()
-}
-
 type GrpcRandomClient struct {
 	RandomClient *client.RandomClient
-	ServerConfig grpcserver.GrpcRandomGameServerConfig
+	ServerConfig remoteserver.GrpcRandomGameServerConfig
 }
 
-func New() *GrpcRandomClient {
+func NewGrpcRandomClient() *GrpcRandomClient {
 	return &GrpcRandomClient{
 		RandomClient: client.New(),
-		ServerConfig: grpcserver.GrpcRandomGameServerConfig{
+		ServerConfig: remoteserver.GrpcRandomGameServerConfig{
 			Host: DefaultServerHost,
-			Port: grpcserver.DefaultPort,
+			Port: remoteserver.DefaultPort,
 		},
 	}
 }

@@ -1,12 +1,14 @@
 package main
 
 import (
-	"game-server/internal/grpcserver"
+	"game-server/internal/remoteserver"
 	"log"
 )
 
 func main() {
-	if err := grpcserver.Serve(); err != nil {
+	rrgs := remoteserver.NewGrpcRandomGameServer()
+
+	if err := rrgs.Serve(); err != nil {
 		log.Fatal(err)
 	}
 }

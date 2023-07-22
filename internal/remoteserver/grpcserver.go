@@ -1,4 +1,4 @@
-package grpcserver
+package remoteserver
 
 import (
 	"fmt"
@@ -12,9 +12,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-// GAME
-const DefaultPort = 4263
-
 type GrpcRandomGameServerConfig struct {
 	Host string
 	Port uint16
@@ -26,7 +23,7 @@ type GrpcRandomGameServer struct {
 	Config           GrpcRandomGameServerConfig
 }
 
-func New() *GrpcRandomGameServer {
+func NewGrpcRandomGameServer() *GrpcRandomGameServer {
 	return &GrpcRandomGameServer{
 		RandomGameServer: server.New(),
 		Config: GrpcRandomGameServerConfig{
@@ -35,8 +32,7 @@ func New() *GrpcRandomGameServer {
 	}
 }
 
-func Serve() error {
-	rrgs := New()
+func (rrgs *GrpcRandomGameServer) Serve() error {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", rrgs.Config.Port))
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)

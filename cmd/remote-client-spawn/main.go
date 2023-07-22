@@ -1,7 +1,7 @@
 package main
 
 import (
-	"game-server/internal/grpcclient"
+	"game-server/internal/remoteclient"
 	"log"
 	"sync"
 	"time"
@@ -17,7 +17,7 @@ func main() {
 			go func() {
 				defer wg.Done()
 
-				rc := grpcclient.New()
+				rc := remoteclient.NewGrpcRandomClient()
 
 				if err := rc.Join(); err != nil {
 					log.Printf("%v", err)
