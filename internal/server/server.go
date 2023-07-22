@@ -88,29 +88,29 @@ func (rgs *RandomGameServer) Loop() {
 	}()
 
 	// Games over cleaner
-	// go func() {
-	// 	for {
-	// 		time.Sleep(8 * time.Second)
+	go func() {
+		for {
+			time.Sleep(8 * time.Second)
 
-	// 		var ids []string
+			var ids []string
 
-	// 		rgs.gamesMutex.Lock()
+			rgs.gamesMutex.Lock()
 
-	// 		for game := range rgs.Games.IterBuffered() {
-	// 			if game.Val.IsOver() {
-	// 				ids = append(ids, game.Val.ID)
-	// 			}
-	// 		}
+			for game := range rgs.Games.IterBuffered() {
+				if game.Val.IsOver() {
+					ids = append(ids, game.Val.ID)
+				}
+			}
 
-	// 		log.Printf("[game-over-cleaner] removing %d games dangling...", len(ids))
+			log.Printf("[game-over-cleaner] removing %d games dangling...", len(ids))
 
-	// 		for _, v := range ids {
-	// 			rgs.Games.Pop(v)
-	// 		}
+			for _, v := range ids {
+				rgs.Games.Pop(v)
+			}
 
-	// 		rgs.gamesMutex.Unlock()
-	// 	}
-	// }()
+			rgs.gamesMutex.Unlock()
+		}
+	}()
 
 	// Print Stats
 	go func() {
