@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	rrgs := remoteserver.NewGrpcRandomGameServer()
+	rrgs := remoteserver.NewTcpSocketRandomGameServer()
 
 	if err := rrgs.Serve(); err != nil {
 		log.Fatal(err)

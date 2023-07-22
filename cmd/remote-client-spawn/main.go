@@ -4,7 +4,6 @@ import (
 	"game-server/internal/remoteclient"
 	"log"
 	"sync"
-	"time"
 )
 
 func main() {
@@ -16,7 +15,7 @@ func main() {
 		go func() {
 			defer wg.Done()
 
-			rc := remoteclient.NewGrpcRandomClient()
+			rc := remoteclient.NewTcpSocketRandomClient()
 
 			if err := rc.Join(); err != nil {
 				log.Printf("%v", err)
@@ -25,6 +24,4 @@ func main() {
 	}
 
 	wg.Wait()
-
-	time.Sleep(10 * time.Second)
 }
