@@ -23,7 +23,7 @@ func (wr *WaitingRoom) Sit(players []*player.Player) {
 	pMap := make(map[string]*player.Player)
 	for _, p := range players {
 		pMap[p.ID] = p
-		msg := fmt.Sprintf("player %s (level %d) sat at the waiting room", p.ID, p.Level)
+		msg := fmt.Sprintf("[waiting-room] player %s (level %d) sat at the waiting room", p.ID, p.Level)
 		// p.SendMsgs(msg)
 		log.Default().Printf(msg)
 	}
@@ -54,6 +54,9 @@ func (wr *WaitingRoom) PlayersWaiting() int {
 func (wr *WaitingRoom) KillRandom() {
 	player, ok := wr.Players.Pop(wr.RandomPlayerKey())
 	if ok {
+		msg := fmt.Sprintf("[%s] [waiting-room] killed", player.ID)
+		player.SendMsgs(msg)
+		log.Default().Printf(msg)
 		player.GameOverCh <- true
 	}
 }
