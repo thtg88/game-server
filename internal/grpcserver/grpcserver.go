@@ -91,6 +91,9 @@ func (rrgs *GrpcRandomGameServer) Play(stream pb.Game_PlayServer) error {
 					return err
 				}
 				gameOver = true
+
+				close(player.GameOverCh)
+				close(player.MessagesCh)
 			}
 		}
 	}
