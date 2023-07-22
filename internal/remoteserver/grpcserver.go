@@ -12,21 +12,16 @@ import (
 	"google.golang.org/grpc"
 )
 
-type GrpcRandomGameServerConfig struct {
-	Host string
-	Port uint16
-}
-
 type GrpcRandomGameServer struct {
 	pb.UnimplementedGameServer
 	RandomGameServer *server.RandomGameServer
-	Config           GrpcRandomGameServerConfig
+	Config           RemoteServerConfig
 }
 
 func NewGrpcRandomGameServer() *GrpcRandomGameServer {
 	return &GrpcRandomGameServer{
 		RandomGameServer: server.New(),
-		Config: GrpcRandomGameServerConfig{
+		Config: RemoteServerConfig{
 			Port: DefaultPort,
 		},
 	}

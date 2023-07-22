@@ -16,13 +16,13 @@ import (
 
 type GrpcRandomClient struct {
 	RandomClient *client.RandomClient
-	ServerConfig remoteserver.GrpcRandomGameServerConfig
+	ServerConfig remoteserver.RemoteServerConfig
 }
 
 func NewGrpcRandomClient() *GrpcRandomClient {
 	return &GrpcRandomClient{
 		RandomClient: client.New(),
-		ServerConfig: remoteserver.GrpcRandomGameServerConfig{
+		ServerConfig: remoteserver.RemoteServerConfig{
 			Host: DefaultServerHost,
 			Port: remoteserver.DefaultPort,
 		},
