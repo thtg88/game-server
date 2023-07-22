@@ -1,4 +1,4 @@
-package remoteserver
+package grpcserver
 
 import (
 	"fmt"
@@ -15,21 +15,21 @@ import (
 // GAME
 const DefaultPort = 4263
 
-type RemoteRandomGameServerConfig struct {
+type GrpcRandomGameServerConfig struct {
 	Host string
 	Port uint16
 }
 
-type RemoteRandomGameServer struct {
+type GrpcRandomGameServer struct {
 	pb.UnimplementedGameServer
 	RandomGameServer *server.RandomGameServer
-	Config           RemoteRandomGameServerConfig
+	Config           GrpcRandomGameServerConfig
 }
 
-func New() *RemoteRandomGameServer {
-	return &RemoteRandomGameServer{
+func New() *GrpcRandomGameServer {
+	return &GrpcRandomGameServer{
 		RandomGameServer: server.New(),
-		Config: RemoteRandomGameServerConfig{
+		Config: GrpcRandomGameServerConfig{
 			Port: DefaultPort,
 		},
 	}
@@ -56,7 +56,7 @@ func Serve() error {
 	return nil
 }
 
-func (rrgs *RemoteRandomGameServer) Play(stream pb.Game_PlayServer) error {
+func (rrgs *GrpcRandomGameServer) Play(stream pb.Game_PlayServer) error {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {

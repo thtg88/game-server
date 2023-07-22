@@ -1,11 +1,11 @@
-package remoteclient
+package grpcclient
 
 import (
 	"context"
 	"fmt"
 	"game-server/internal/client"
+	"game-server/internal/grpcserver"
 	pb "game-server/internal/msgs/msg"
-	"game-server/internal/remoteserver"
 	"io"
 	"log"
 	"time"
@@ -20,22 +20,22 @@ type RemoteClient interface {
 	JoinRemoteServer()
 }
 
-type RemoteRandomClient struct {
+type GrpcRandomClient struct {
 	RandomClient *client.RandomClient
-	ServerConfig remoteserver.RemoteRandomGameServerConfig
+	ServerConfig grpcserver.GrpcRandomGameServerConfig
 }
 
-func New() *RemoteRandomClient {
-	return &RemoteRandomClient{
+func New() *GrpcRandomClient {
+	return &GrpcRandomClient{
 		RandomClient: client.New(),
-		ServerConfig: remoteserver.RemoteRandomGameServerConfig{
+		ServerConfig: grpcserver.GrpcRandomGameServerConfig{
 			Host: DefaultServerHost,
-			Port: remoteserver.DefaultPort,
+			Port: grpcserver.DefaultPort,
 		},
 	}
 }
 
-func (rrc *RemoteRandomClient) Join() error {
+func (rrc *GrpcRandomClient) Join() error {
 	conn, err := grpc.Dial(
 		rrc.grpcDialTarget(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -50,11 +50,11 @@ func (rrc *RemoteRandomClient) Join() error {
 	return rrc.play(client)
 }
 
-func (rrc *RemoteRandomClient) grpcDialTarget() string {
+func (rrc *GrpcRandomClient) grpcDialTarget() string {
 	return fmt.Sprintf("%s:%d", rrc.ServerConfig.Host, rrc.ServerConfig.Port)
 }
 
-func (rrc *RemoteRandomClient) play(client pb.GameClient) error {
+func (rrc *GrpcRandomClient) play(client pb.GameClient) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
 
