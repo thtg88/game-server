@@ -68,7 +68,7 @@ func (rrc *GrpcRandomClient) play(client pb.GameClient) error {
 
 	go func() {
 		for {
-			in, err := stream.Recv()
+			resp, err := stream.Recv()
 			if err == io.EOF {
 				// read done.
 				close(waitc)
@@ -79,7 +79,7 @@ func (rrc *GrpcRandomClient) play(client pb.GameClient) error {
 				close(waitc)
 				break
 			}
-			log.Println(in.Message)
+			log.Println(resp.Message)
 		}
 	}()
 

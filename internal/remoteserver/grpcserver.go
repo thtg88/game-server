@@ -28,19 +28,21 @@ func NewGrpcRandomGameServer() *GrpcRandomGameServer {
 }
 
 func (rrgs *GrpcRandomGameServer) Serve() error {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", rrgs.Config.Port))
+	address := fmt.Sprintf(":%d", rrgs.Config.Port)
+
+	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
 
-	pb.RegisterGameServer(s, rrgs)
+	server := grpc.NewServer()
+	pb.RegisterGameServer(server, rrgs)
 
 	log.Printf("server listening at %v", lis.Addr())
 
 	rrgs.RandomGameServer.Loop()
 
-	if err := s.Serve(lis); err != nil {
+	if err := server.Serve(lis); err != nil {
 		return fmt.Errorf("failed to serve: %v", err)
 	}
 
@@ -49,7 +51,7 @@ func (rrgs *GrpcRandomGameServer) Serve() error {
 
 func (rrgs *GrpcRandomGameServer) Play(stream pb.Game_PlayServer) error {
 	for {
-		in, err := stream.Recv()
+		req, err := stream.Recv()
 		if err == io.EOF {
 			return nil
 		}
@@ -59,8 +61,8 @@ func (rrgs *GrpcRandomGameServer) Play(stream pb.Game_PlayServer) error {
 
 		player := &player.Player{
 			GameOverCh: make(chan bool),
-			ID:         in.Player.Id,
-			Level:      in.Player.Level,
+			ID:         req.Player.Id,
+			Level:      req.Player.Level,
 			MessagesCh: make(chan string),
 		}
 
