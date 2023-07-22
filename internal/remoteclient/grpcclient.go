@@ -76,6 +76,7 @@ func (rrc *GrpcRandomClient) play(client pb.GameClient) error {
 			}
 			if err != nil {
 				log.Printf("client.Play failed: %v", err)
+				close(waitc)
 				break
 			}
 			log.Println(in.Message)
