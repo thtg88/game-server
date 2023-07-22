@@ -94,6 +94,11 @@ func (rgs *RandomGameServer) Loop() {
 
 			var ids []string
 
+			if rgs.Games.Count() == 0 {
+				log.Printf("[game-over-cleaner] no games dangling")
+				continue
+			}
+
 			rgs.gamesMutex.Lock()
 
 			for game := range rgs.Games.IterBuffered() {
