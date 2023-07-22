@@ -12,6 +12,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/keepalive"
 )
 
 type GrpcRandomClient struct {
@@ -30,9 +31,16 @@ func NewGrpcRandomClient() *GrpcRandomClient {
 }
 
 func (rrc *GrpcRandomClient) Join() error {
+	kacp := keepalive.ClientParameters{
+		Time:    5 * time.Second, // send pings every 10 seconds if there is no activity
+		Timeout: time.Second,     // wait 1 second for ping ack before considering the connection dead
+		// PermitWithoutStream: true,             // send pings even without active streams
+	}
+
 	conn, err := grpc.Dial(
 		rrc.grpcDialTarget(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithKeepaliveParams(kacp),
 	)
 	if err != nil {
 		return err
