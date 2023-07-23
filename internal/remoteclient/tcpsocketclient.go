@@ -52,7 +52,7 @@ func (rrc *TcpSocketRandomClient) play(conn net.Conn) error {
 
 	go func() {
 		for {
-			resp, err := recv(conn)
+			resp, err := rrc.recv(conn)
 			if err == io.EOF {
 				// read done.
 				close(waitc)
@@ -68,7 +68,7 @@ func (rrc *TcpSocketRandomClient) play(conn net.Conn) error {
 		}
 	}()
 
-	if err := send(conn, req); err != nil {
+	if err := rrc.send(conn, req); err != nil {
 		return err
 	}
 
@@ -77,8 +77,8 @@ func (rrc *TcpSocketRandomClient) play(conn net.Conn) error {
 	return nil
 }
 
-func send(conn net.Conn, req *msgs.PlayRequest) error {
-	data, err := serializeRequest(req)
+func (rrc *TcpSocketRandomClient) send(conn net.Conn, req *msgs.PlayRequest) error {
+	data, err := rrc.serializeRequest(req)
 	if err != nil {
 		return err
 	}
@@ -88,7 +88,7 @@ func send(conn net.Conn, req *msgs.PlayRequest) error {
 	return err
 }
 
-func serializeRequest(req *msgs.PlayRequest) (string, error) {
+func (rrc *TcpSocketRandomClient) serializeRequest(req *msgs.PlayRequest) (string, error) {
 	data, err := proto.Marshal(req)
 	if err != nil {
 		return "", err
@@ -99,16 +99,16 @@ func serializeRequest(req *msgs.PlayRequest) (string, error) {
 	return fmt.Sprintf("%s\n", text), nil
 }
 
-func recv(conn net.Conn) (*msgs.PlayReply, error) {
+func (rrc *TcpSocketRandomClient) recv(conn net.Conn) (*msgs.PlayReply, error) {
 	message, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
 		return nil, err
 	}
 
-	return deserializeResponse(message)
+	return rrc.deserializeResponse(message)
 }
 
-func deserializeResponse(message string) (*msgs.PlayReply, error) {
+func (rrc *TcpSocketRandomClient) deserializeResponse(message string) (*msgs.PlayReply, error) {
 	bytes, err := base64.StdEncoding.DecodeString(message)
 	if err != nil {
 		return nil, err
