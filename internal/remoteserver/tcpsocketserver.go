@@ -60,7 +60,7 @@ func (rrgs *TcpSocketRandomGameServer) Serve() error {
 }
 
 func (rrgs *TcpSocketRandomGameServer) Play(conn net.Conn) error {
-	req, err := recv(conn)
+	req, err := rrgs.recv(conn)
 	if err != nil {
 		return err
 	}
@@ -79,13 +79,13 @@ func (rrgs *TcpSocketRandomGameServer) Play(conn net.Conn) error {
 		case logMsg := <-player.MessagesCh:
 			resp := &msgs.PlayReply{Message: logMsg}
 
-			if err := send(conn, resp); err != nil {
+			if err := rrgs.send(conn, resp); err != nil {
 				return err
 			}
 		case <-player.GameOverCh:
 			resp := &msgs.PlayReply{Message: "game over!"}
 
-			if err := send(conn, resp); err != nil {
+			if err := rrgs.send(conn, resp); err != nil {
 				return err
 			}
 
@@ -97,16 +97,16 @@ func (rrgs *TcpSocketRandomGameServer) Play(conn net.Conn) error {
 	}
 }
 
-func recv(conn net.Conn) (*msgs.PlayRequest, error) {
+func (rrgs *TcpSocketRandomGameServer) recv(conn net.Conn) (*msgs.PlayRequest, error) {
 	netData, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
 		return nil, err
 	}
 
-	return deserializeRequest(netData)
+	return rrgs.deserializeRequest(netData)
 }
 
-func deserializeRequest(message string) (*msgs.PlayRequest, error) {
+func (rrgs *TcpSocketRandomGameServer) deserializeRequest(message string) (*msgs.PlayRequest, error) {
 	bytes, err := base64.StdEncoding.DecodeString(message)
 	if err != nil {
 		return nil, err
@@ -122,8 +122,8 @@ func deserializeRequest(message string) (*msgs.PlayRequest, error) {
 	return &req, nil
 }
 
-func send(conn net.Conn, resp *msgs.PlayReply) error {
-	bytes, err := serializeResponse(resp)
+func (rrgs *TcpSocketRandomGameServer) send(conn net.Conn, resp *msgs.PlayReply) error {
+	bytes, err := rrgs.serializeResponse(resp)
 	if err != nil {
 		return err
 	}
@@ -133,7 +133,7 @@ func send(conn net.Conn, resp *msgs.PlayReply) error {
 	return err
 }
 
-func serializeResponse(resp *msgs.PlayReply) ([]byte, error) {
+func (rrgs *TcpSocketRandomGameServer) serializeResponse(resp *msgs.PlayReply) ([]byte, error) {
 	marshaled, err := proto.Marshal(resp)
 	if err != nil {
 		return []byte{}, err

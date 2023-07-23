@@ -62,17 +62,14 @@ func (rrgs *GrpcRandomGameServer) Play(req *msgs.PlayRequest, stream msgs.Game_P
 	for !gameOver {
 		select {
 		case logMsg := <-player.MessagesCh:
-			resp := &msgs.PlayReply{Message: logMsg}
-
-			if err := stream.Send(resp); err != nil {
+			if err := rrgs.send(stream, logMsg); err != nil {
 				return err
 			}
 		case <-player.GameOverCh:
-			resp := &msgs.PlayReply{Message: "game over!"}
-
-			if err := stream.Send(resp); err != nil {
+			if err := rrgs.send(stream, "game over!"); err != nil {
 				return err
 			}
+
 			gameOver = true
 
 			close(player.GameOverCh)
@@ -81,4 +78,10 @@ func (rrgs *GrpcRandomGameServer) Play(req *msgs.PlayRequest, stream msgs.Game_P
 	}
 
 	return nil
+}
+
+func (rrgs *GrpcRandomGameServer) send(stream msgs.Game_PlayServer, message string) error {
+	resp := &msgs.PlayReply{Message: message}
+
+	return stream.Send(resp)
 }
