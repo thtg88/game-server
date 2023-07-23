@@ -15,7 +15,7 @@ func main() {
 		go func() {
 			defer wg.Done()
 
-			rc := remoteclient.NewTcpSocketRandomClient()
+			rc := remoteclient.NewGrpcRandomClient()
 
 			if err := rc.Join(); err != nil {
 				log.Printf("%v", err)

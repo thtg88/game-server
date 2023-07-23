@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	rc := remoteclient.NewTcpSocketRandomClient()
+	rc := remoteclient.NewGrpcRandomClient()
 
 	if err := rc.Join(); err != nil {
 		log.Fatal(err)
