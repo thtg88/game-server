@@ -60,7 +60,7 @@ func (rrgs *TcpSocketRandomGameServer) Serve() error {
 }
 
 func (rrgs *TcpSocketRandomGameServer) Play(conn net.Conn) error {
-	req, err := rrgs.recv(conn)
+	req, err := rrgs.recvRequest(conn)
 	if err != nil {
 		return err
 	}
@@ -79,13 +79,13 @@ func (rrgs *TcpSocketRandomGameServer) Play(conn net.Conn) error {
 		case logMsg := <-player.MessagesCh:
 			resp := &msgs.PlayReply{Message: logMsg}
 
-			if err := rrgs.send(conn, resp); err != nil {
+			if err := rrgs.sendResponse(conn, resp); err != nil {
 				return err
 			}
 		case <-player.GameOverCh:
 			resp := &msgs.PlayReply{Message: "game over!"}
 
-			if err := rrgs.send(conn, resp); err != nil {
+			if err := rrgs.sendResponse(conn, resp); err != nil {
 				return err
 			}
 
@@ -97,7 +97,7 @@ func (rrgs *TcpSocketRandomGameServer) Play(conn net.Conn) error {
 	}
 }
 
-func (rrgs *TcpSocketRandomGameServer) recv(conn net.Conn) (*msgs.PlayRequest, error) {
+func (rrgs *TcpSocketRandomGameServer) recvRequest(conn net.Conn) (*msgs.PlayRequest, error) {
 	netData, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
 		return nil, err
@@ -122,7 +122,7 @@ func (rrgs *TcpSocketRandomGameServer) deserializeRequest(message string) (*msgs
 	return &req, nil
 }
 
-func (rrgs *TcpSocketRandomGameServer) send(conn net.Conn, resp *msgs.PlayReply) error {
+func (rrgs *TcpSocketRandomGameServer) sendResponse(conn net.Conn, resp *msgs.PlayReply) error {
 	bytes, err := rrgs.serializeResponse(resp)
 	if err != nil {
 		return err
