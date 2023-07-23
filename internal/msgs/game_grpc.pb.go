@@ -22,11 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GameClient interface {
-	// A Bidirectional streaming RPC.
-	//
-	// Accepts a stream of PlayRequest sent while a route is being traversed,
-	// while receiving PlayReply.
-	Play(ctx context.Context, opts ...grpc.CallOption) (Game_PlayClient, error)
+	// A server-to-client streaming RPC.
+	Play(ctx context.Context, in *PlayRequest, opts ...grpc.CallOption) (Game_PlayClient, error)
 }
 
 type gameClient struct {
@@ -37,27 +34,28 @@ func NewGameClient(cc grpc.ClientConnInterface) GameClient {
 	return &gameClient{cc}
 }
 
-func (c *gameClient) Play(ctx context.Context, opts ...grpc.CallOption) (Game_PlayClient, error) {
+func (c *gameClient) Play(ctx context.Context, in *PlayRequest, opts ...grpc.CallOption) (Game_PlayClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Game_ServiceDesc.Streams[0], "/msg.Game/Play", opts...)
 	if err != nil {
 		return nil, err
 	}
 	x := &gamePlayClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
 	return x, nil
 }
 
 type Game_PlayClient interface {
-	Send(*PlayRequest) error
 	Recv() (*PlayReply, error)
 	grpc.ClientStream
 }
 
 type gamePlayClient struct {
 	grpc.ClientStream
-}
-
-func (x *gamePlayClient) Send(m *PlayRequest) error {
-	return x.ClientStream.SendMsg(m)
 }
 
 func (x *gamePlayClient) Recv() (*PlayReply, error) {
@@ -72,11 +70,8 @@ func (x *gamePlayClient) Recv() (*PlayReply, error) {
 // All implementations must embed UnimplementedGameServer
 // for forward compatibility
 type GameServer interface {
-	// A Bidirectional streaming RPC.
-	//
-	// Accepts a stream of PlayRequest sent while a route is being traversed,
-	// while receiving PlayReply.
-	Play(Game_PlayServer) error
+	// A server-to-client streaming RPC.
+	Play(*PlayRequest, Game_PlayServer) error
 	mustEmbedUnimplementedGameServer()
 }
 
@@ -84,7 +79,7 @@ type GameServer interface {
 type UnimplementedGameServer struct {
 }
 
-func (UnimplementedGameServer) Play(Game_PlayServer) error {
+func (UnimplementedGameServer) Play(*PlayRequest, Game_PlayServer) error {
 	return status.Errorf(codes.Unimplemented, "method Play not implemented")
 }
 func (UnimplementedGameServer) mustEmbedUnimplementedGameServer() {}
@@ -101,12 +96,15 @@ func RegisterGameServer(s grpc.ServiceRegistrar, srv GameServer) {
 }
 
 func _Game_Play_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(GameServer).Play(&gamePlayServer{stream})
+	m := new(PlayRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(GameServer).Play(m, &gamePlayServer{stream})
 }
 
 type Game_PlayServer interface {
 	Send(*PlayReply) error
-	Recv() (*PlayRequest, error)
 	grpc.ServerStream
 }
 
@@ -116,14 +114,6 @@ type gamePlayServer struct {
 
 func (x *gamePlayServer) Send(m *PlayReply) error {
 	return x.ServerStream.SendMsg(m)
-}
-
-func (x *gamePlayServer) Recv() (*PlayRequest, error) {
-	m := new(PlayRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
 }
 
 // Game_ServiceDesc is the grpc.ServiceDesc for Game service.
@@ -138,7 +128,6 @@ var Game_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "Play",
 			Handler:       _Game_Play_Handler,
 			ServerStreams: true,
-			ClientStreams: true,
 		},
 	},
 	Metadata: "internal/msgs/game.proto",

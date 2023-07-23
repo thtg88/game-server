@@ -52,13 +52,6 @@ func (rrc *GrpcRandomClient) play(client msgs.GameClient) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	stream, err := client.Play(ctx)
-	if err != nil {
-		return fmt.Errorf("client.Play failed: %v", err)
-	}
-
-	waitc := make(chan struct{})
-
 	req := &msgs.PlayRequest{
 		Player: &msgs.Player{
 			Id:    rrc.RandomClient.Player.ID,
@@ -66,32 +59,22 @@ func (rrc *GrpcRandomClient) play(client msgs.GameClient) error {
 		},
 	}
 
-	go func() {
-		for {
-			resp, err := stream.Recv()
-			if err == io.EOF {
-				// read done.
-				close(waitc)
-				return
-			}
-			if err != nil {
-				log.Printf("client.Play failed: %v", err)
-				close(waitc)
-				break
-			}
-			log.Println(resp.Message)
+	stream, err := client.Play(ctx, req)
+	if err != nil {
+		return fmt.Errorf("client.Play failed: %v", err)
+	}
+
+	for {
+		resp, err := stream.Recv()
+		if err == io.EOF {
+			break
 		}
-	}()
+		if err != nil {
+			return fmt.Errorf("client.Play failed: %v", err)
+		}
 
-	if err := stream.Send(req); err != nil {
-		return fmt.Errorf("client.Play: stream.Send(%v) failed: %v", req, err)
+		log.Println(resp.Message)
 	}
-
-	if err := stream.CloseSend(); err != nil {
-		return err
-	}
-
-	<-waitc
 
 	return nil
 }

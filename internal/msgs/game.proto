@@ -9,11 +9,8 @@ package msg;
 
 // The Game service definition.
 service Game {
-  // A Bidirectional streaming RPC.
-  //
-  // Accepts a stream of PlayRequest sent while a route is being traversed,
-  // while receiving PlayReply.
-  rpc Play (stream PlayRequest) returns (stream PlayReply) {}
+  // A server-to-client streaming RPC.
+  rpc Play (PlayRequest) returns (stream PlayReply) {}
 }
 
 message Player {

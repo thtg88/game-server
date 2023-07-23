@@ -5,7 +5,6 @@ import (
 	"game-server/internal/msgs"
 	"game-server/internal/player"
 	"game-server/internal/server"
-	"io"
 	"log"
 	"net"
 
@@ -38,7 +37,7 @@ func (rrgs *GrpcRandomGameServer) Serve() error {
 	server := grpc.NewServer()
 	msgs.RegisterGameServer(server, rrgs)
 
-	log.Printf("server listening at %v", lis.Addr())
+	log.Printf("gRPC server listening at %v", lis.Addr())
 
 	rrgs.RandomGameServer.Loop()
 
@@ -49,45 +48,37 @@ func (rrgs *GrpcRandomGameServer) Serve() error {
 	return nil
 }
 
-func (rrgs *GrpcRandomGameServer) Play(stream msgs.Game_PlayServer) error {
-	for {
-		req, err := stream.Recv()
-		if err == io.EOF {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
+func (rrgs *GrpcRandomGameServer) Play(req *msgs.PlayRequest, stream msgs.Game_PlayServer) error {
+	player := &player.Player{
+		GameOverCh: make(chan bool),
+		ID:         req.Player.Id,
+		Level:      req.Player.Level,
+		MessagesCh: make(chan string),
+	}
 
-		player := &player.Player{
-			GameOverCh: make(chan bool),
-			ID:         req.Player.Id,
-			Level:      req.Player.Level,
-			MessagesCh: make(chan string),
-		}
+	rrgs.RandomGameServer.Join(player)
 
-		rrgs.RandomGameServer.Join(player)
+	gameOver := false
+	for !gameOver {
+		select {
+		case logMsg := <-player.MessagesCh:
+			resp := &msgs.PlayReply{Message: logMsg}
 
-		gameOver := false
-		for !gameOver {
-			select {
-			case logMsg := <-player.MessagesCh:
-				resp := &msgs.PlayReply{Message: logMsg}
-
-				if err := stream.Send(resp); err != nil {
-					return err
-				}
-			case <-player.GameOverCh:
-				resp := &msgs.PlayReply{Message: "game over!"}
-
-				if err := stream.Send(resp); err != nil {
-					return err
-				}
-				gameOver = true
-
-				close(player.GameOverCh)
-				close(player.MessagesCh)
+			if err := stream.Send(resp); err != nil {
+				return err
 			}
+		case <-player.GameOverCh:
+			resp := &msgs.PlayReply{Message: "game over!"}
+
+			if err := stream.Send(resp); err != nil {
+				return err
+			}
+			gameOver = true
+
+			close(player.GameOverCh)
+			close(player.MessagesCh)
 		}
 	}
+
+	return nil
 }
