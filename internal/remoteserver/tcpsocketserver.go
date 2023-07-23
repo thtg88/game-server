@@ -54,12 +54,12 @@ func (rrgs *TcpSocketRandomGameServer) Serve() error {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			rrgs.serve(conn)
+			rrgs.Play(conn)
 		}()
 	}
 }
 
-func (rrgs *TcpSocketRandomGameServer) serve(conn net.Conn) error {
+func (rrgs *TcpSocketRandomGameServer) Play(conn net.Conn) error {
 	req, err := recv(conn)
 	if err != nil {
 		return err
