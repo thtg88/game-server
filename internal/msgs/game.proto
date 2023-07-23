@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-option go_package = "github.com/thtg88/game-server/msg/game";
+option go_package = "github.com/thtg88/game-server/internal/msgs";
 option java_multiple_files = true;
-option java_package = "io.grpc.gameserver.msg";
+option java_package = "io.grpc.gameserver.msgs";
 option java_outer_classname = "GameProto";
 
 package msg;

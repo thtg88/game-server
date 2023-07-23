@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"encoding/base64"
 	"fmt"
-	pb "game-server/internal/msgs/msg"
+	"game-server/internal/msgs"
 	"game-server/internal/player"
 	"game-server/internal/server"
 	"log"
@@ -77,13 +77,13 @@ func (rrgs *TcpSocketRandomGameServer) serve(conn net.Conn) error {
 	for {
 		select {
 		case logMsg := <-player.MessagesCh:
-			resp := &pb.PlayReply{Message: logMsg}
+			resp := &msgs.PlayReply{Message: logMsg}
 
 			if err := send(conn, resp); err != nil {
 				return err
 			}
 		case <-player.GameOverCh:
-			resp := &pb.PlayReply{Message: "game over!"}
+			resp := &msgs.PlayReply{Message: "game over!"}
 
 			if err := send(conn, resp); err != nil {
 				return err
@@ -97,7 +97,7 @@ func (rrgs *TcpSocketRandomGameServer) serve(conn net.Conn) error {
 	}
 }
 
-func recv(conn net.Conn) (*pb.PlayRequest, error) {
+func recv(conn net.Conn) (*msgs.PlayRequest, error) {
 	netData, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
 		return nil, err
@@ -106,13 +106,13 @@ func recv(conn net.Conn) (*pb.PlayRequest, error) {
 	return deserializeRequest(netData)
 }
 
-func deserializeRequest(message string) (*pb.PlayRequest, error) {
+func deserializeRequest(message string) (*msgs.PlayRequest, error) {
 	bytes, err := base64.StdEncoding.DecodeString(message)
 	if err != nil {
 		return nil, err
 	}
 
-	var req pb.PlayRequest
+	var req msgs.PlayRequest
 
 	err = proto.Unmarshal(bytes, &req)
 	if err != nil {
@@ -122,7 +122,7 @@ func deserializeRequest(message string) (*pb.PlayRequest, error) {
 	return &req, nil
 }
 
-func send(conn net.Conn, resp *pb.PlayReply) error {
+func send(conn net.Conn, resp *msgs.PlayReply) error {
 	bytes, err := serializeResponse(resp)
 	if err != nil {
 		return err
@@ -133,7 +133,7 @@ func send(conn net.Conn, resp *pb.PlayReply) error {
 	return err
 }
 
-func serializeResponse(resp *pb.PlayReply) ([]byte, error) {
+func serializeResponse(resp *msgs.PlayReply) ([]byte, error) {
 	marshaled, err := proto.Marshal(resp)
 	if err != nil {
 		return []byte{}, err

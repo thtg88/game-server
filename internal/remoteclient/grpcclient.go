@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"game-server/internal/client"
-	pb "game-server/internal/msgs/msg"
+	"game-server/internal/msgs"
 	"game-server/internal/remoteserver"
 	"io"
 	"log"
@@ -39,7 +39,7 @@ func (rrc *GrpcRandomClient) Join() error {
 	}
 	defer conn.Close()
 
-	client := pb.NewGameClient(conn)
+	client := msgs.NewGameClient(conn)
 
 	return rrc.play(client)
 }
@@ -48,7 +48,7 @@ func (rrc *GrpcRandomClient) grpcDialTarget() string {
 	return fmt.Sprintf("%s:%d", rrc.ServerConfig.Host, rrc.ServerConfig.Port)
 }
 
-func (rrc *GrpcRandomClient) play(client pb.GameClient) error {
+func (rrc *GrpcRandomClient) play(client msgs.GameClient) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -59,8 +59,8 @@ func (rrc *GrpcRandomClient) play(client pb.GameClient) error {
 
 	waitc := make(chan struct{})
 
-	req := &pb.PlayRequest{
-		Player: &pb.Player{
+	req := &msgs.PlayRequest{
+		Player: &msgs.Player{
 			Id:    rrc.RandomClient.Player.ID,
 			Level: rrc.RandomClient.Player.Level,
 		},

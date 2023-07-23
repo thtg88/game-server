@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.23.4
-// source: msg/game.proto
+// source: internal/msgs/game.proto
 
-package game
+package msgs
 
 import (
 	context "context"
@@ -141,5 +141,5 @@ var Game_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-	Metadata: "msg/game.proto",
+	Metadata: "internal/msgs/game.proto",
 }

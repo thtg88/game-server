@@ -2,7 +2,7 @@ package remoteserver
 
 import (
 	"fmt"
-	pb "game-server/internal/msgs/msg"
+	"game-server/internal/msgs"
 	"game-server/internal/player"
 	"game-server/internal/server"
 	"io"
@@ -13,7 +13,7 @@ import (
 )
 
 type GrpcRandomGameServer struct {
-	pb.UnimplementedGameServer
+	msgs.UnimplementedGameServer
 	RandomGameServer *server.RandomGameServer
 	Config           RemoteServerConfig
 }
@@ -36,7 +36,7 @@ func (rrgs *GrpcRandomGameServer) Serve() error {
 	}
 
 	server := grpc.NewServer()
-	pb.RegisterGameServer(server, rrgs)
+	msgs.RegisterGameServer(server, rrgs)
 
 	log.Printf("server listening at %v", lis.Addr())
 
@@ -49,7 +49,7 @@ func (rrgs *GrpcRandomGameServer) Serve() error {
 	return nil
 }
 
-func (rrgs *GrpcRandomGameServer) Play(stream pb.Game_PlayServer) error {
+func (rrgs *GrpcRandomGameServer) Play(stream msgs.Game_PlayServer) error {
 	for {
 		req, err := stream.Recv()
 		if err == io.EOF {
@@ -72,13 +72,13 @@ func (rrgs *GrpcRandomGameServer) Play(stream pb.Game_PlayServer) error {
 		for !gameOver {
 			select {
 			case logMsg := <-player.MessagesCh:
-				resp := &pb.PlayReply{Message: logMsg}
+				resp := &msgs.PlayReply{Message: logMsg}
 
 				if err := stream.Send(resp); err != nil {
 					return err
 				}
 			case <-player.GameOverCh:
-				resp := &pb.PlayReply{Message: "game over!"}
+				resp := &msgs.PlayReply{Message: "game over!"}
 
 				if err := stream.Send(resp); err != nil {
 					return err

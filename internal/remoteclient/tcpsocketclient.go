@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"game-server/internal/client"
-	pb "game-server/internal/msgs/msg"
+	"game-server/internal/msgs"
 	"game-server/internal/remoteserver"
 	"io"
 	"log"
@@ -43,8 +43,8 @@ func (rrc *TcpSocketRandomClient) Join() error {
 func (rrc *TcpSocketRandomClient) play(conn net.Conn) error {
 	waitc := make(chan struct{})
 
-	req := &pb.PlayRequest{
-		Player: &pb.Player{
+	req := &msgs.PlayRequest{
+		Player: &msgs.Player{
 			Id:    rrc.RandomClient.Player.ID,
 			Level: rrc.RandomClient.Player.Level,
 		},
@@ -77,7 +77,7 @@ func (rrc *TcpSocketRandomClient) play(conn net.Conn) error {
 	return nil
 }
 
-func send(conn net.Conn, req *pb.PlayRequest) error {
+func send(conn net.Conn, req *msgs.PlayRequest) error {
 	data, err := serializeRequest(req)
 	if err != nil {
 		return err
@@ -88,7 +88,7 @@ func send(conn net.Conn, req *pb.PlayRequest) error {
 	return err
 }
 
-func serializeRequest(req *pb.PlayRequest) (string, error) {
+func serializeRequest(req *msgs.PlayRequest) (string, error) {
 	data, err := proto.Marshal(req)
 	if err != nil {
 		return "", err
@@ -99,7 +99,7 @@ func serializeRequest(req *pb.PlayRequest) (string, error) {
 	return fmt.Sprintf("%s\n", text), nil
 }
 
-func recv(conn net.Conn) (*pb.PlayReply, error) {
+func recv(conn net.Conn) (*msgs.PlayReply, error) {
 	message, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
 		return nil, err
@@ -108,13 +108,13 @@ func recv(conn net.Conn) (*pb.PlayReply, error) {
 	return deserializeResponse(message)
 }
 
-func deserializeResponse(message string) (*pb.PlayReply, error) {
+func deserializeResponse(message string) (*msgs.PlayReply, error) {
 	bytes, err := base64.StdEncoding.DecodeString(message)
 	if err != nil {
 		return nil, err
 	}
 
-	var resp pb.PlayReply
+	var resp msgs.PlayReply
 
 	err = proto.Unmarshal(bytes, &resp)
 	if err != nil {
