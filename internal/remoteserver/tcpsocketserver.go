@@ -37,7 +37,7 @@ func (rrgs *TcpSocketRandomGameServer) Serve() error {
 	}
 	defer lis.Close()
 
-	log.Printf("server listening at %v", lis.Addr())
+	log.Printf("TCP server listening at %v", lis.Addr())
 
 	rrgs.RandomGameServer.Loop()
 
