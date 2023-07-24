@@ -143,6 +143,7 @@ func (rgs *RandomGameServer) cleanDanglingGamesOver() {
 
 		if rgs.Games.Count() == 0 {
 			log.Println("[game-over-cleaner] no games dangling")
+			time.Sleep(8 * time.Second)
 			continue
 		}
 
