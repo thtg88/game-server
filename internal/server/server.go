@@ -7,7 +7,10 @@ import (
 	"game-server/internal/player"
 	"game-server/internal/waitingroom"
 	"log"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 	"time"
 
 	cmap "github.com/orcaman/concurrent-map/v2"
@@ -39,6 +42,24 @@ func New() *RandomGameServer {
 		Games:                       cmap.New[*game.RandomGame](),
 		WaitingRoom:                 waitingroom.New(),
 	}
+}
+
+func HandleShutdownSignal(onShutdownReceived func()) chan struct{} {
+	shutdownCh := make(chan struct{})
+
+	go func() {
+		sigNotifier := make(chan os.Signal, 1)
+
+		signal.Notify(sigNotifier, os.Interrupt, syscall.SIGTERM)
+
+		// Park here until a signal is received
+		<-sigNotifier
+
+		onShutdownReceived()
+		close(shutdownCh)
+	}()
+
+	return shutdownCh
 }
 
 func (rgs *RandomGameServer) Shutdown() {
