@@ -25,8 +25,6 @@ type RandomGameServer struct {
 	canPrintStats               bool
 	isAcceptingNewPlayers       bool
 
-	gameOverCh chan string
-
 	Games       cmap.ConcurrentMap[string, *game.RandomGame]
 	gamesMutex  sync.RWMutex
 	WaitingRoom *waitingroom.WaitingRoom
@@ -38,7 +36,6 @@ func New() *RandomGameServer {
 		canKillRandomWaitingPlayers: true,
 		canPrintStats:               true,
 		isAcceptingNewPlayers:       true,
-		gameOverCh:                  make(chan string),
 		Games:                       cmap.New[*game.RandomGame](),
 		WaitingRoom:                 waitingroom.New(),
 	}
@@ -60,8 +57,6 @@ func (rgs *RandomGameServer) Shutdown() {
 	rgs.WaitingRoom.KillAll()
 
 	rgs.canPrintStats = false
-
-	close(rgs.gameOverCh)
 }
 
 func (rgs *RandomGameServer) Join(p *player.Player) error {
@@ -78,7 +73,6 @@ func (rgs *RandomGameServer) Loop() {
 	log.Println("server started")
 
 	go rgs.startNewGames()
-	go rgs.endGamesOver()
 	go rgs.killRandomWaitingPlayers()
 	go rgs.cleanDanglingGamesOver()
 	go rgs.printStats()
@@ -94,7 +88,8 @@ func (rgs *RandomGameServer) startNewGames() {
 			pair := rgs.WaitingRoom.Pair()
 			g := game.New(pair)
 			rgs.Games.Set(g.ID, g)
-			go g.Start(rgs.gameOverCh)
+			go g.Start()
+			go rgs.waitForGameOver(g)
 
 			rgs.gamesMutex.Unlock()
 
@@ -109,23 +104,16 @@ func (rgs *RandomGameServer) startNewGames() {
 	log.Println("[game-starter] stopped accepting new players")
 }
 
-func (rgs *RandomGameServer) endGamesOver() {
-	for {
-		gameID, closed := <-rgs.gameOverCh
-		if closed {
-			break
-		}
+func (rgs *RandomGameServer) waitForGameOver(g *game.RandomGame) {
+	<-g.OverCh
 
-		msg1 := fmt.Sprintf("[%s] [game-ender] received game over message", gameID)
-		log.Println(msg1)
+	msg1 := fmt.Sprintf("[%s] [game-ender] received game over message", g.ID)
+	log.Println(msg1)
 
-		rgs.Games.Pop(gameID)
+	rgs.Games.Remove(g.ID)
 
-		msg2 := fmt.Sprintf("[%s] [game-ender] game removed, %d games left", gameID, rgs.Games.Count())
-		log.Println(msg2)
-	}
-
-	log.Println("[game-ender] all games are over")
+	msg2 := fmt.Sprintf("[%s] [game-ender] game removed, %d games left", g.ID, rgs.Games.Count())
+	log.Println(msg2)
 }
 
 func (rgs *RandomGameServer) killRandomWaitingPlayers() {

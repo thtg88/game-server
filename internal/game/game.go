@@ -18,6 +18,7 @@ type Game interface {
 type RandomGame struct {
 	EndDate *time.Time
 	ID      string
+	OverCh  chan struct{}
 	Player1 *player.Player
 	Player2 *player.Player
 }
@@ -35,13 +36,14 @@ func New(players []*player.Player) *RandomGame {
 
 	return &RandomGame{
 		ID:      uuid.NewString(),
+		OverCh:  make(chan struct{}),
 		Player1: players[0],
 		Player2: players[1],
 		EndDate: &endDate,
 	}
 }
 
-func (rg *RandomGame) Start(gameOverCh chan<- string) {
+func (rg *RandomGame) Start() {
 	for i := 0; !rg.IsOver(); i++ {
 		rg.Round(i)
 	}
@@ -56,7 +58,7 @@ func (rg *RandomGame) Start(gameOverCh chan<- string) {
 	close(rg.Player2.GameOverCh)
 
 	// Then let the server clean up the game
-	gameOverCh <- rg.ID
+	close(rg.OverCh)
 }
 
 func (rg *RandomGame) Round(round int) {
