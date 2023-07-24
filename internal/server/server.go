@@ -172,6 +172,7 @@ func (rgs *RandomGameServer) cleanDanglingGamesOver() {
 
 		if len(ids) == 0 {
 			log.Println("[game-over-cleaner] no games dangling")
+			rgs.gamesMutex.Unlock()
 			time.Sleep(8 * time.Second)
 			continue
 		}
