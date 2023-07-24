@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"game-server/internal/game"
 	"game-server/internal/player"
@@ -13,11 +14,12 @@ import (
 )
 
 type GameServer interface {
-	Join(*player.Player)
+	Join(*player.Player) error
 	Loop()
 }
 
 type RandomGameServer struct {
+	isAcceptingNewPlayers       bool
 	Games       cmap.ConcurrentMap[string, *game.RandomGame]
 	gamesMutex  sync.RWMutex
 	WaitingRoom *waitingroom.WaitingRoom
@@ -27,11 +29,18 @@ func New() *RandomGameServer {
 	return &RandomGameServer{
 		Games:       cmap.New[*game.RandomGame](),
 		WaitingRoom: waitingroom.New(),
+		isAcceptingNewPlayers:       true,
 	}
 }
 
-func (rgs *RandomGameServer) Join(p *player.Player) {
+func (rgs *RandomGameServer) Join(p *player.Player) error {
+	if !rgs.isAcceptingNewPlayers {
+		return errors.New("not accepting new players")
+	}
+
 	rgs.WaitingRoom.Sit([]*player.Player{p})
+
+	return nil
 }
 
 func (rgs *RandomGameServer) Loop() {
