@@ -89,9 +89,6 @@ func (rrgs *TcpSocketRandomGameServer) Play(conn net.Conn) error {
 				return err
 			}
 
-			close(player.GameOverCh)
-			close(player.MessagesCh)
-
 			return conn.Close()
 		}
 	}

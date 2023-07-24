@@ -71,9 +71,6 @@ func (rrgs *GrpcRandomGameServer) Play(req *msgs.PlayRequest, stream msgs.Game_P
 			}
 
 			gameOver = true
-
-			close(player.GameOverCh)
-			close(player.MessagesCh)
 		}
 	}
 
