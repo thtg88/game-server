@@ -20,7 +20,7 @@ func main() {
 			rc := remoteclient.NewGrpcRandomClient()
 
 			if err := rc.Join(); err != nil {
-				log.Printf("%v", err)
+				log.Println(err)
 			}
 		}()
 	}
