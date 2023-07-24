@@ -58,6 +58,8 @@ func (rgs *RandomGameServer) Shutdown() {
 	rgs.WaitingRoom.KillAll()
 
 	rgs.canPrintStats = false
+
+	close(rgs.gameOverCh)
 }
 
 func (rgs *RandomGameServer) Join(p *player.Player) error {
