@@ -23,24 +23,29 @@ type GameServer interface {
 }
 
 type RandomGameServer struct {
-	canCleanGamesDangling       bool
-	canKillRandomWaitingPlayers bool
-	canPrintStats               bool
-	isAcceptingNewPlayers       bool
-
+	config      *config
 	Games       cmap.ConcurrentMap[string, *game.RandomGame]
 	gamesMutex  sync.RWMutex
 	WaitingRoom *waitingroom.WaitingRoom
 }
 
+type config struct {
+	canCleanGamesDangling       bool
+	canKillRandomWaitingPlayers bool
+	canPrintStats               bool
+	isAcceptingNewPlayers       bool
+}
+
 func New() *RandomGameServer {
 	return &RandomGameServer{
-		canCleanGamesDangling:       true,
-		canKillRandomWaitingPlayers: true,
-		canPrintStats:               true,
-		isAcceptingNewPlayers:       true,
-		Games:                       cmap.New[*game.RandomGame](),
-		WaitingRoom:                 waitingroom.New(),
+		config: &config{
+			canCleanGamesDangling:       true,
+			canKillRandomWaitingPlayers: true,
+			canPrintStats:               true,
+			isAcceptingNewPlayers:       true,
+		},
+		Games:       cmap.New[*game.RandomGame](),
+		WaitingRoom: waitingroom.New(),
 	}
 }
 
@@ -65,23 +70,23 @@ func HandleShutdownSignal(onShutdownReceived func()) chan struct{} {
 func (rgs *RandomGameServer) Shutdown() {
 	log.Println("[random-game-server] shutting down...")
 
-	rgs.isAcceptingNewPlayers = false
-	rgs.canKillRandomWaitingPlayers = false
+	rgs.config.isAcceptingNewPlayers = false
+	rgs.config.canKillRandomWaitingPlayers = false
 
 	// wait for all games to be over
 	for rgs.Games.Count() > 0 {
 		time.Sleep(100 * time.Millisecond)
 	}
 
-	rgs.canCleanGamesDangling = false
+	rgs.config.canCleanGamesDangling = false
 
 	rgs.WaitingRoom.KillAll()
 
-	rgs.canPrintStats = false
+	rgs.config.canPrintStats = false
 }
 
 func (rgs *RandomGameServer) Join(p *player.Player) error {
-	if !rgs.isAcceptingNewPlayers {
+	if !rgs.config.isAcceptingNewPlayers {
 		return errors.New("not accepting new players")
 	}
 
@@ -100,7 +105,7 @@ func (rgs *RandomGameServer) Loop() {
 }
 
 func (rgs *RandomGameServer) startNewGames() {
-	for rgs.isAcceptingNewPlayers {
+	for rgs.config.isAcceptingNewPlayers {
 		for rgs.WaitingRoom.PlayersWaiting() >= 2 {
 			// log.Println("[game-starter] players waiting")
 
@@ -138,7 +143,7 @@ func (rgs *RandomGameServer) waitForGameOver(g *game.RandomGame) {
 }
 
 func (rgs *RandomGameServer) killRandomWaitingPlayers() {
-	for rgs.canKillRandomWaitingPlayers {
+	for rgs.config.canKillRandomWaitingPlayers {
 		rgs.WaitingRoom.KillRandom()
 
 		time.Sleep(10 * time.Second)
@@ -148,7 +153,7 @@ func (rgs *RandomGameServer) killRandomWaitingPlayers() {
 }
 
 func (rgs *RandomGameServer) cleanDanglingGamesOver() {
-	for rgs.canCleanGamesDangling {
+	for rgs.config.canCleanGamesDangling {
 		if rgs.Games.Count() == 0 {
 			log.Println("[game-over-cleaner] no games dangling")
 			time.Sleep(8 * time.Second)
@@ -186,7 +191,7 @@ func (rgs *RandomGameServer) cleanDanglingGamesOver() {
 }
 
 func (rgs *RandomGameServer) printStats() {
-	for rgs.canPrintStats {
+	for rgs.config.canPrintStats {
 		log.Printf("[stats-printer] %d games active, %d players waiting", rgs.Games.Count(), rgs.WaitingRoom.PlayersWaiting())
 
 		time.Sleep(1 * time.Second)
