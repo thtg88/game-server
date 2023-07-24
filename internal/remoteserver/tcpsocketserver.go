@@ -77,15 +77,11 @@ func (rrgs *TcpSocketRandomGameServer) Play(conn net.Conn) error {
 	for {
 		select {
 		case logMsg := <-player.MessagesCh:
-			resp := &msgs.PlayReply{Message: logMsg}
-
-			if err := rrgs.sendResponse(conn, resp); err != nil {
+			if err := rrgs.sendResponse(conn, logMsg); err != nil {
 				return err
 			}
 		case <-player.GameOverCh:
-			resp := &msgs.PlayReply{Message: "game over!"}
-
-			if err := rrgs.sendResponse(conn, resp); err != nil {
+			if err := rrgs.sendResponse(conn, "game over!"); err != nil {
 				return err
 			}
 
@@ -119,7 +115,9 @@ func (rrgs *TcpSocketRandomGameServer) deserializeRequest(message string) (*msgs
 	return &req, nil
 }
 
-func (rrgs *TcpSocketRandomGameServer) sendResponse(conn net.Conn, resp *msgs.PlayReply) error {
+func (rrgs *TcpSocketRandomGameServer) sendResponse(conn net.Conn, msg string) error {
+	resp := &msgs.PlayReply{Message: msg}
+
 	bytes, err := rrgs.serializeResponse(resp)
 	if err != nil {
 		return err
