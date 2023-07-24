@@ -76,7 +76,15 @@ func (rrgs *TcpSocketRandomGameServer) Play(conn net.Conn) error {
 		MessagesCh: make(chan string),
 	}
 
-	rrgs.RandomGameServer.Join(player)
+	err = rrgs.RandomGameServer.Join(player)
+	if err != nil {
+		// an error in joining means we are not accepting new players, so send the message to the client
+		if sendErr := rrgs.sendResponse(conn, err.Error()); sendErr != nil {
+			return sendErr
+		}
+
+		return err
+	}
 
 	for {
 		select {
