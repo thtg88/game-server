@@ -20,6 +20,9 @@ type GameServer interface {
 
 type RandomGameServer struct {
 	isAcceptingNewPlayers       bool
+
+	gameOverCh chan string
+
 	Games       cmap.ConcurrentMap[string, *game.RandomGame]
 	gamesMutex  sync.RWMutex
 	WaitingRoom *waitingroom.WaitingRoom
@@ -30,6 +33,7 @@ func New() *RandomGameServer {
 		Games:       cmap.New[*game.RandomGame](),
 		WaitingRoom: waitingroom.New(),
 		isAcceptingNewPlayers:       true,
+		gameOverCh:                  make(chan string),
 	}
 }
 
@@ -45,8 +49,6 @@ func (rgs *RandomGameServer) Join(p *player.Player) error {
 
 func (rgs *RandomGameServer) Loop() {
 	log.Default().Println("server started")
-
-	gameOverCh := make(chan string)
 
 	// Start new games
 	go func() {
