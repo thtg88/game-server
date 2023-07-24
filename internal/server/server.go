@@ -133,13 +133,9 @@ func (rgs *RandomGameServer) startNewGames() {
 func (rgs *RandomGameServer) waitForGameOver(g *game.RandomGame) {
 	<-g.OverCh
 
-	msg1 := fmt.Sprintf("[%s] [game-ender] received game over message", g.ID)
-	log.Println(msg1)
-
 	rgs.Games.Remove(g.ID)
 
-	msg2 := fmt.Sprintf("[%s] [game-ender] game removed, %d games left", g.ID, rgs.Games.Count())
-	log.Println(msg2)
+	log.Printf("[%s] [game-ender] game removed", g.ID)
 }
 
 func (rgs *RandomGameServer) killRandomWaitingPlayers() {
