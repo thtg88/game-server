@@ -52,7 +52,11 @@ func (wr *WaitingRoom) PlayersWaiting() int {
 }
 
 func (wr *WaitingRoom) KillRandom() {
-	player, ok := wr.Players.Pop(wr.RandomPlayerKey())
+	wr.kill(wr.RandomPlayerKey())
+}
+
+func (wr *WaitingRoom) kill(playerKey string) {
+	player, ok := wr.Players.Pop(playerKey)
 	if ok {
 		msg := fmt.Sprintf("[%s] [waiting-room] killed", player.ID)
 		player.SendMsgs(msg)
