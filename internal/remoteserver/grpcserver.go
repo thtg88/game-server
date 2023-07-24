@@ -50,7 +50,7 @@ func (rrgs *GrpcRandomGameServer) Serve() error {
 
 func (rrgs *GrpcRandomGameServer) Play(req *msgs.PlayRequest, stream msgs.Game_PlayServer) error {
 	player := &player.Player{
-		GameOverCh: make(chan bool),
+		GameOverCh: make(chan struct{}),
 		ID:         req.Player.Id,
 		Level:      req.Player.Level,
 		MessagesCh: make(chan string),

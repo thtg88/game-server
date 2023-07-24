@@ -66,7 +66,7 @@ func (rrgs *TcpSocketRandomGameServer) Play(conn net.Conn) error {
 	}
 
 	player := &player.Player{
-		GameOverCh: make(chan bool),
+		GameOverCh: make(chan struct{}),
 		ID:         req.Player.Id,
 		Level:      req.Player.Level,
 		MessagesCh: make(chan string),
