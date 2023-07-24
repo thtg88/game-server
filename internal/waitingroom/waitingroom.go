@@ -67,7 +67,7 @@ func (wr *WaitingRoom) kill(playerKey string) {
 		msg := fmt.Sprintf("[%s] [waiting-room] killed", player.ID)
 		player.SendMsgs(msg)
 		log.Println(msg)
-		player.GameOverCh <- true
+		close(player.GameOverCh)
 	}
 }
 

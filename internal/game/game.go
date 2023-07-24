@@ -52,8 +52,8 @@ func (rg *RandomGame) Start(gameOverCh chan<- string) {
 	// TODO: Increment player levels
 
 	// First let the clients disconnect
-	rg.Player1.GameOverCh <- true
-	rg.Player2.GameOverCh <- true
+	close(rg.Player1.GameOverCh)
+	close(rg.Player2.GameOverCh)
 
 	// Then let the server clean up the game
 	gameOverCh <- rg.ID
