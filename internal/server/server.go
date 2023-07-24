@@ -149,13 +149,13 @@ func (rgs *RandomGameServer) killRandomWaitingPlayers() {
 
 func (rgs *RandomGameServer) cleanDanglingGamesOver() {
 	for rgs.canCleanGamesDangling {
-		var ids []string
-
 		if rgs.Games.Count() == 0 {
 			log.Println("[game-over-cleaner] no games dangling")
 			time.Sleep(8 * time.Second)
 			continue
 		}
+
+		var ids []string
 
 		rgs.gamesMutex.Lock()
 
@@ -163,6 +163,12 @@ func (rgs *RandomGameServer) cleanDanglingGamesOver() {
 			if game.Val.IsOver() {
 				ids = append(ids, game.Val.ID)
 			}
+		}
+
+		if len(ids) == 0 {
+			log.Println("[game-over-cleaner] no games dangling")
+			time.Sleep(8 * time.Second)
+			continue
 		}
 
 		log.Printf("[game-over-cleaner] removing %d games dangling...", len(ids))
