@@ -45,6 +45,8 @@ func New() *RandomGameServer {
 }
 
 func (rgs *RandomGameServer) Shutdown() {
+	log.Println("[random-game-server] shutting down...")
+
 	rgs.isAcceptingNewPlayers = false
 	rgs.canKillRandomWaitingPlayers = false
 	rgs.canCleanGamesDangling = false
@@ -99,6 +101,8 @@ func (rgs *RandomGameServer) startNewGames() {
 
 		time.Sleep(4 * time.Millisecond)
 	}
+
+	log.Println("[game-starter] stopped accepting new players")
 }
 
 func (rgs *RandomGameServer) endGamesOver() {
@@ -113,6 +117,8 @@ func (rgs *RandomGameServer) endGamesOver() {
 		msg2 := fmt.Sprintf("[%s] [game-ender] game removed, %d games left", gameID, rgs.Games.Count())
 		log.Default().Printf(msg2)
 	}
+
+	log.Println("[game-ender] all games are over")
 }
 
 func (rgs *RandomGameServer) killRandomWaitingPlayers() {
@@ -121,6 +127,8 @@ func (rgs *RandomGameServer) killRandomWaitingPlayers() {
 
 		time.Sleep(10 * time.Second)
 	}
+
+	log.Println("[random-player-killer] stopped killing")
 }
 
 func (rgs *RandomGameServer) cleanDanglingGamesOver() {
@@ -160,4 +168,6 @@ func (rgs *RandomGameServer) printStats() {
 
 		time.Sleep(1 * time.Second)
 	}
+
+	log.Println("[stats-printer] stopped printing")
 }
