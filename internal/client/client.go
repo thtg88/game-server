@@ -50,7 +50,4 @@ func (c *RandomClient) gameLoop() {
 			gameOver = true
 		}
 	}
-
-	close(c.Player.GameOverCh)
-	close(c.Player.MessagesCh)
 }
