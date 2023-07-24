@@ -9,6 +9,8 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type GrpcRandomGameServer struct {
@@ -56,7 +58,10 @@ func (rrgs *GrpcRandomGameServer) Play(req *msgs.PlayRequest, stream msgs.Game_P
 		MessagesCh: make(chan string),
 	}
 
-	rrgs.RandomGameServer.Join(player)
+	err := rrgs.RandomGameServer.Join(player)
+	if err != nil {
+		return status.Error(codes.Unavailable, err.Error())
+	}
 
 	gameOver := false
 	for !gameOver {
