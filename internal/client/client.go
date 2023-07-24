@@ -28,24 +28,25 @@ func Spawn(gs server.GameServer) {
 
 		gs.Join(c.Player)
 
-		// Consume channels
-		go func(p *player.Player) {
-			gameOver := false
-
-			for !gameOver {
-				select {
-				case <-p.MessagesCh:
-					// log.Printf("[client-loop] got message %s from server", msg)
-				case <-p.GameOverCh:
-					log.Printf("[%s] [client-loop] it's game over!", p.ID)
-					gameOver = true
-				}
-			}
-
-			close(p.GameOverCh)
-			close(p.MessagesCh)
-		}(c.Player)
+		go c.gameLoop()
 
 		time.Sleep(50 * time.Millisecond)
 	}
+}
+
+func (c *RandomClient) gameLoop() {
+	gameOver := false
+
+	for !gameOver {
+		select {
+		case <-c.Player.MessagesCh:
+			// log.Printf("[client-loop] got message %s from server", msg)
+		case <-c.Player.GameOverCh:
+			log.Printf("[%s] [client-loop] it's game over!", c.Player.ID)
+			gameOver = true
+		}
+	}
+
+	close(c.Player.GameOverCh)
+	close(c.Player.MessagesCh)
 }
