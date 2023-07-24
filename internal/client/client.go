@@ -5,6 +5,7 @@ import (
 	"game-server/internal/server"
 	"log"
 	"time"
+	"sync"
 )
 
 type Client interface {
@@ -21,7 +22,11 @@ func New() *RandomClient {
 }
 
 func Spawn(gs server.GameServer) {
-	for {
+	var wg sync.WaitGroup
+
+	defer wg.Wait()
+
+	for i := 0; i < 10000; i++ {
 		c := New()
 
 		// log.Println("new client")
@@ -32,7 +37,11 @@ func Spawn(gs server.GameServer) {
 			break
 		}
 
-		go c.gameLoop()
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			c.gameLoop()
+		}()
 
 		time.Sleep(50 * time.Millisecond)
 	}
