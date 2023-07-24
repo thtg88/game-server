@@ -19,6 +19,8 @@ type GameServer interface {
 }
 
 type RandomGameServer struct {
+	canKillRandomWaitingPlayers bool
+	canPrintStats               bool
 	isAcceptingNewPlayers       bool
 
 	gameOverCh chan string
@@ -30,10 +32,12 @@ type RandomGameServer struct {
 
 func New() *RandomGameServer {
 	return &RandomGameServer{
-		Games:       cmap.New[*game.RandomGame](),
-		WaitingRoom: waitingroom.New(),
+		canKillRandomWaitingPlayers: true,
+		canPrintStats:               true,
 		isAcceptingNewPlayers:       true,
 		gameOverCh:                  make(chan string),
+		Games:                       cmap.New[*game.RandomGame](),
+		WaitingRoom:                 waitingroom.New(),
 	}
 }
 
