@@ -29,8 +29,6 @@ func Spawn(gs server.GameServer) {
 	for i := 0; i < 10000; i++ {
 		c := New()
 
-		// log.Println("new client")
-
 		err := gs.Join(c.Player)
 		if err != nil {
 			log.Printf("[client-loop] error joining the server: %v", err)
