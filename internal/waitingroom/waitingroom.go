@@ -51,6 +51,12 @@ func (wr *WaitingRoom) PlayersWaiting() int {
 	return wr.Players.Count()
 }
 
+func (wr *WaitingRoom) KillAll() {
+	for item := range wr.Players.IterBuffered() {
+		wr.kill(item.Key)
+	}
+}
+
 func (wr *WaitingRoom) KillRandom() {
 	wr.kill(wr.RandomPlayerKey())
 }
