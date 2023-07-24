@@ -4,8 +4,8 @@ import (
 	"game-server/internal/player"
 	"game-server/internal/server"
 	"log"
-	"time"
 	"sync"
+	"time"
 )
 
 type Client interface {
