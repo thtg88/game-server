@@ -20,6 +20,7 @@ type GameServer interface {
 }
 
 type RandomGameServer struct {
+	canCleanGamesDangling       bool
 	canKillRandomWaitingPlayers bool
 	canPrintStats               bool
 	isAcceptingNewPlayers       bool
@@ -33,6 +34,7 @@ type RandomGameServer struct {
 
 func New() *RandomGameServer {
 	return &RandomGameServer{
+		canCleanGamesDangling:       true,
 		canKillRandomWaitingPlayers: true,
 		canPrintStats:               true,
 		isAcceptingNewPlayers:       true,
@@ -45,6 +47,7 @@ func New() *RandomGameServer {
 func (rgs *RandomGameServer) Shutdown() {
 	rgs.isAcceptingNewPlayers = false
 	rgs.canKillRandomWaitingPlayers = false
+	rgs.canCleanGamesDangling = false
 
 	for rgs.Games.Count() > 0 {
 		time.Sleep(200 * time.Millisecond)
@@ -121,7 +124,7 @@ func (rgs *RandomGameServer) killRandomWaitingPlayers() {
 }
 
 func (rgs *RandomGameServer) cleanDanglingGamesOver() {
-	for {
+	for rgs.canCleanGamesDangling {
 		var ids []string
 
 		if rgs.Games.Count() == 0 {
@@ -147,6 +150,8 @@ func (rgs *RandomGameServer) cleanDanglingGamesOver() {
 
 		time.Sleep(8 * time.Second)
 	}
+
+	log.Printf("[game-over-cleaner] stopped cleaning")
 }
 
 func (rgs *RandomGameServer) printStats() {
