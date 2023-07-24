@@ -14,8 +14,28 @@ gvm install go1.20
 
 ## Development
 
-You can test the program using:
+You can test the program locally without any remote calls with:
 
 ```bash
-go run main.go
+go run cmd/local-game-simulation/main.go
 ```
+
+Otherwise you can test a client-server setup by running the server in one terminal with:
+
+```bash
+go run cmd/remote-server/main.go
+```
+
+And any other number of clients in different terminal windows with:
+
+```bash
+go run cmd/remote-client/main.go
+```
+
+Additionally a command to spawn 10,000 clients against the server is available with:
+
+```bash
+go run cmd/remote-client-spawn/main.go
+```
+
+Be careful though, as this is quite resource-intensive and, if you over-do it, you may run out of available TCP ports on your machine :D
