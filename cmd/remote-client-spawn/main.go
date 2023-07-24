@@ -9,6 +9,8 @@ import (
 func main() {
 	var wg sync.WaitGroup
 
+	defer wg.Wait()
+
 	for j := 0; j < 10000; j++ {
 		wg.Add(1)
 
@@ -22,6 +24,4 @@ func main() {
 			}
 		}()
 	}
-
-	wg.Wait()
 }
