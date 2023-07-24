@@ -51,8 +51,9 @@ func (rgs *RandomGameServer) Shutdown() {
 	rgs.canKillRandomWaitingPlayers = false
 	rgs.canCleanGamesDangling = false
 
+	// wait for all games to be over
 	for rgs.Games.Count() > 0 {
-		time.Sleep(200 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
 
 	rgs.WaitingRoom.KillAll()
