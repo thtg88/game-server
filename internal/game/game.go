@@ -55,7 +55,9 @@ func (rg *RandomGame) Start() {
 
 	// First let the clients disconnect
 	close(rg.Player1.GameOverCh)
+	close(rg.Player1.MessagesCh)
 	close(rg.Player2.GameOverCh)
+	close(rg.Player2.MessagesCh)
 
 	// Then let the server clean up the game
 	close(rg.OverCh)
