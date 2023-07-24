@@ -9,5 +9,5 @@ func main() {
 	rgs := server.New()
 
 	rgs.Loop()
-	client.Loop(rgs)
+	client.Spawn(rgs)
 }

@@ -20,7 +20,7 @@ func New() *RandomClient {
 	return &RandomClient{Player: &p}
 }
 
-func Loop(gs server.GameServer) {
+func Spawn(gs server.GameServer) {
 	for {
 		c := New()
 
