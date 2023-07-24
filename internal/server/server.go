@@ -110,7 +110,10 @@ func (rgs *RandomGameServer) startNewGames() {
 
 func (rgs *RandomGameServer) endGamesOver() {
 	for {
-		gameID := <-rgs.gameOverCh
+		gameID, closed := <-rgs.gameOverCh
+		if closed {
+			break
+		}
 
 		msg1 := fmt.Sprintf("[%s] [game-ender] received game over message", gameID)
 		log.Default().Println(msg1)
