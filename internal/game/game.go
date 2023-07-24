@@ -47,7 +47,7 @@ func (rg *RandomGame) Start(gameOverCh chan<- string) {
 	}
 
 	msg := fmt.Sprintf("[%s] [game] game over", rg.ID)
-	log.Default().Println(msg)
+	log.Println(msg)
 
 	// TODO: Increment player levels
 

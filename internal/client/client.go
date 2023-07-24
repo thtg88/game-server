@@ -24,7 +24,7 @@ func Spawn(gs server.GameServer) {
 	for {
 		c := New()
 
-		// log.Default().Println("new client")
+		// log.Println("new client")
 
 		err := gs.Join(c.Player)
 		if err != nil {

@@ -74,7 +74,7 @@ func (rgs *RandomGameServer) Join(p *player.Player) error {
 }
 
 func (rgs *RandomGameServer) Loop() {
-	log.Default().Println("server started")
+	log.Println("server started")
 
 	go rgs.startNewGames()
 	go rgs.endGamesOver()
@@ -86,7 +86,7 @@ func (rgs *RandomGameServer) Loop() {
 func (rgs *RandomGameServer) startNewGames() {
 	for rgs.isAcceptingNewPlayers {
 		for rgs.WaitingRoom.PlayersWaiting() >= 2 {
-			// log.Default().Println("[game-starter] players waiting")
+			// log.Println("[game-starter] players waiting")
 
 			rgs.gamesMutex.Lock()
 
@@ -99,7 +99,7 @@ func (rgs *RandomGameServer) startNewGames() {
 
 			msg := fmt.Sprintf("[%s] [game-starter] new game started with players: %s and %s, it will end at %s", g.ID, pair[0].ID, pair[1].ID, g.EndDate.String())
 			g.SendMsgs(msg)
-			log.Default().Println(msg)
+			log.Println(msg)
 		}
 
 		time.Sleep(4 * time.Millisecond)
@@ -116,12 +116,12 @@ func (rgs *RandomGameServer) endGamesOver() {
 		}
 
 		msg1 := fmt.Sprintf("[%s] [game-ender] received game over message", gameID)
-		log.Default().Println(msg1)
+		log.Println(msg1)
 
 		rgs.Games.Pop(gameID)
 
 		msg2 := fmt.Sprintf("[%s] [game-ender] game removed, %d games left", gameID, rgs.Games.Count())
-		log.Default().Printf(msg2)
+		log.Println(msg2)
 	}
 
 	log.Println("[game-ender] all games are over")
@@ -142,7 +142,7 @@ func (rgs *RandomGameServer) cleanDanglingGamesOver() {
 		var ids []string
 
 		if rgs.Games.Count() == 0 {
-			log.Printf("[game-over-cleaner] no games dangling")
+			log.Println("[game-over-cleaner] no games dangling")
 			continue
 		}
 
@@ -165,12 +165,12 @@ func (rgs *RandomGameServer) cleanDanglingGamesOver() {
 		time.Sleep(8 * time.Second)
 	}
 
-	log.Printf("[game-over-cleaner] stopped cleaning")
+	log.Println("[game-over-cleaner] stopped cleaning")
 }
 
 func (rgs *RandomGameServer) printStats() {
 	for rgs.canPrintStats {
-		log.Default().Printf("[stats-printer] %d games active, %d players waiting", rgs.Games.Count(), rgs.WaitingRoom.PlayersWaiting())
+		log.Printf("[stats-printer] %d games active, %d players waiting", rgs.Games.Count(), rgs.WaitingRoom.PlayersWaiting())
 
 		time.Sleep(1 * time.Second)
 	}

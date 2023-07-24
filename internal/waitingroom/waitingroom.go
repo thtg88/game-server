@@ -25,7 +25,7 @@ func (wr *WaitingRoom) Sit(players []*player.Player) {
 		pMap[p.ID] = p
 		msg := fmt.Sprintf("[waiting-room] player %s (level %d) sat at the waiting room", p.ID, p.Level)
 		// p.SendMsgs(msg)
-		log.Default().Printf(msg)
+		log.Println(msg)
 	}
 
 	wr.Players.MSet(pMap)
@@ -66,7 +66,7 @@ func (wr *WaitingRoom) kill(playerKey string) {
 	if ok {
 		msg := fmt.Sprintf("[%s] [waiting-room] killed", player.ID)
 		player.SendMsgs(msg)
-		log.Default().Printf(msg)
+		log.Println(msg)
 		player.GameOverCh <- true
 	}
 }
