@@ -52,10 +52,14 @@ func (rrgs *TcpSocketRandomGameServer) Serve() error {
 		}
 
 		wg.Add(1)
-		go func() {
+		go func(conn net.Conn) {
 			defer wg.Done()
-			rrgs.Play(conn)
-		}()
+			defer conn.Close()
+
+			if err := rrgs.Play(conn); err != nil {
+				log.Println(err)
+			}
+		}(conn)
 	}
 }
 
