@@ -16,6 +16,7 @@ import (
 type GameServer interface {
 	Join(*player.Player) error
 	Loop()
+	Shutdown()
 }
 
 type RandomGameServer struct {
@@ -39,6 +40,19 @@ func New() *RandomGameServer {
 		Games:                       cmap.New[*game.RandomGame](),
 		WaitingRoom:                 waitingroom.New(),
 	}
+}
+
+func (rgs *RandomGameServer) Shutdown() {
+	rgs.isAcceptingNewPlayers = false
+	rgs.canKillRandomWaitingPlayers = false
+
+	for rgs.Games.Count() > 0 {
+		time.Sleep(200 * time.Millisecond)
+	}
+
+	rgs.WaitingRoom.KillAll()
+
+	rgs.canPrintStats = false
 }
 
 func (rgs *RandomGameServer) Join(p *player.Player) error {
